@@ -111,13 +111,27 @@ const SurveyForm = (props) => {
   );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+// Use a self-executing function to initialize the component
+const initializeSurveyForm = () => {
   const container = document.getElementById('survey-form-container');
-  if (container) {
+  if (container && !container.hasAttribute('data-react-initialized')) {
     const surveyData = JSON.parse(container.dataset.survey || '{}');
+    
+    // Mark as initialized to prevent double initialization
+    container.setAttribute('data-react-initialized', 'true');
+    
     const root = createRoot(container);
     root.render(<SurveyForm survey={surveyData} />);
   }
-});
+};
+
+// Try to initialize immediately
+initializeSurveyForm();
+
+// Also listen for DOMContentLoaded
+document.addEventListener('DOMContentLoaded', initializeSurveyForm);
+
+// Additionally listen for turbo:load event if using Turbo
+document.addEventListener('turbo:load', initializeSurveyForm);
 
 export default SurveyForm; 

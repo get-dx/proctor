@@ -276,6 +276,42 @@ const TakeSurvey = (props) => {
           </div>
         );
       
+      case 'rating':
+        return (
+          <div className="mb-4">
+            <fieldset>
+              <legend className="block text-gray-700 text-sm font-bold mb-2">
+                {question.content} {question.required && <span className="text-red-500">*</span>}
+              </legend>
+              <div className="mt-2">
+                <div className="flex items-center space-x-2">
+                  {[1, 2, 3, 4, 5].map((rating) => (
+                    <div key={rating} className="flex flex-col items-center">
+                      <input
+                        id={`question_${question.id}_rating_${rating}`}
+                        name={`question_${question.id}`}
+                        type="radio"
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                        value={rating.toString()}
+                        checked={responses[question.id] === rating.toString()}
+                        onChange={() => handleInputChange(question.id, rating.toString())}
+                        required={question.required}
+                      />
+                      <label htmlFor={`question_${question.id}_rating_${rating}`} className="mt-1 text-sm text-gray-700">
+                        {rating}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>Poor</span>
+                  <span>Excellent</span>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        );
+      
       default:
         return (
           <div className="mb-4">
@@ -349,11 +385,15 @@ const TakeSurvey = (props) => {
   );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+// Use a self-executing function to initialize the component
+const initializeTakeSurvey = () => {
   const container = document.getElementById('take-survey-container');
-  if (container) {
+  if (container && !container.hasAttribute('data-react-initialized')) {
     const surveyData = JSON.parse(container.dataset.survey || '{}');
     const questionsData = JSON.parse(container.dataset.questions || '[]');
+    
+    // Mark as initialized to prevent double initialization
+    container.setAttribute('data-react-initialized', 'true');
     
     const root = createRoot(container);
     root.render(
@@ -363,6 +403,15 @@ document.addEventListener('DOMContentLoaded', () => {
       />
     );
   }
-});
+};
+
+// Try to initialize immediately
+initializeTakeSurvey();
+
+// Also listen for DOMContentLoaded
+document.addEventListener('DOMContentLoaded', initializeTakeSurvey);
+
+// Additionally listen for turbo:load event if using Turbo
+document.addEventListener('turbo:load', initializeTakeSurvey);
 
 export default TakeSurvey; 

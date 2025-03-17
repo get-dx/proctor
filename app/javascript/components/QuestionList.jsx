@@ -99,12 +99,16 @@ const QuestionList = (props) => {
   );
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+// Use a self-executing function to initialize the component
+const initializeQuestionList = () => {
   const container = document.getElementById('question-list-container');
-  if (container) {
+  if (container && !container.hasAttribute('data-react-initialized')) {
     const surveyId = container.dataset.surveyId;
     const questionsData = JSON.parse(container.dataset.questions || '[]');
     const autoload = container.dataset.autoload === 'true';
+    
+    // Mark as initialized to prevent double initialization
+    container.setAttribute('data-react-initialized', 'true');
     
     const root = createRoot(container);
     root.render(
@@ -115,6 +119,15 @@ document.addEventListener('DOMContentLoaded', () => {
       />
     );
   }
-});
+};
+
+// Try to initialize immediately
+initializeQuestionList();
+
+// Also listen for DOMContentLoaded
+document.addEventListener('DOMContentLoaded', initializeQuestionList);
+
+// Additionally listen for turbo:load event if using Turbo
+document.addEventListener('turbo:load', initializeQuestionList);
 
 export default QuestionList; 

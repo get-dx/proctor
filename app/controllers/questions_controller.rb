@@ -8,6 +8,7 @@ class QuestionsController < ApplicationController
 
   def create
     @question = @survey.questions.new(question_params)
+    process_options
 
     if @question.save
       redirect_to survey_path(@survey), notice: 'Question was successfully created.'
@@ -21,7 +22,12 @@ class QuestionsController < ApplicationController
 
   def update
     if @question.update(question_params)
-      redirect_to survey_path(@survey), notice: 'Question was successfully updated.'
+      process_options
+      if @question.save
+        redirect_to survey_path(@survey), notice: 'Question was successfully updated.'
+      else
+        render :edit, status: :unprocessable_entity
+      end
     else
       render :edit, status: :unprocessable_entity
     end
@@ -43,6 +49,15 @@ class QuestionsController < ApplicationController
   end
   
   def question_params
-    params.require(:question).permit(:content, :question_type, :position)
+    params.require(:question).permit(:content, :question_type, :position, :required, options: [])
+  end
+  
+  def process_options
+    if params[:question][:options].present? && ['multiple_choice', 'checkbox'].include?(@question.question_type)
+      # Split the options by newline and remove any blank lines
+      @question.options = params[:question][:options].split("\n").map(&:strip).reject(&:blank?)
+    else
+      @question.options = []
+    end
   end
 end
