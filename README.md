@@ -1,17 +1,22 @@
 # Proctor: Survey A/B Testing Engine
 
-This is a coding challenge for implementing a Survey A/B Testing Engine. Do not spend more tha 4 hours on your implementation.
+This is a coding challenge for implementing a Survey A/B Testing Engine.
 
 ## Challenge Description
 
 Your task is to implement A/B testing functionality in this application.
 
-The boilerplate code provides a very basic survey application with the ability to create surveys, add questions, and collect responses. Your job is to extend this functionality to support A/B testing. The testing should be primarily based upon copy changes, question types, question order, or other survey enhancement. It should not be testing any UI differences like button colors or positioning. The implementation should be easily demo-able.
+The boilerplate code provides a very basic survey application with the ability to create surveys, add questions, and collect responses. Your job is to extend this functionality to support A/B testing.
 
 Here are a few ideas of things that you could do to accomplish this:
-* A/B testing could happen on the question level or on the survey level
-* There could be a way to visualize the different responses and the variant effectiveness
+* Implement a UI to manage A/B testing for different survey question phrasings
+* Update the respondent experience to take A/B testing into account
+* Add a way to easily analyze the response data between different variants
 
+Any and all existing code or seed data can be edited in any way. Anything that's here is purely to serve as a functional starting point to begin building off of.
+
+## Evaluation Criteria
+The purpose of this exercise is to evaluate how you would implement a moderately complex feature, consider tradeoffs, and explain your thinking on a real project. We are not evaluating your ability to implement algorithms from scratch — feel free to use tools or libraries that you would reach for in your actual day to day work.
 
 ## Technology Stack
 
@@ -65,11 +70,6 @@ The application uses React for the frontend. The main components are:
 - **TakeSurvey**: For taking surveys and submitting responses
 
 These components are located in the `app/javascript/components` directory.
-
-Any and all existing code or seed data can be edited in any way. Anything that's here is purely to serve as a functional starting point to begin building off of.
-
-## Evaluation Criteria
-The purpose of this excercise is not to evaluate any sort of exactness in implementation. We want to evaluate how you operate in ambiguity and start a dialogue around your architecture, the things you feel you did well, and what you think could be better. We hope to see your thought process and how you arrived at the key decisions, the tradeoffs, and other new ideas.
 
 ## Submission
 
