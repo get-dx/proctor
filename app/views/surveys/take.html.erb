@@ -1,0 +1,74 @@
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h1 class="text-2xl font-bold text-gray-900"><%= @survey.title %></h1>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500"><%= @survey.description %></p>
+  </div>
+  
+  <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+    <!-- React Take Survey Component -->
+    <div id="take-survey-container" 
+         data-survey="<%= @survey.to_json %>" 
+         data-questions="<%= @questions.to_json %>"
+         data-survey-version="<%= @survey_version || 'A' %>">
+    </div>
+    
+    <!-- Fallback for when JavaScript is disabled -->
+    <noscript>
+      <%= form_with(url: submit_survey_path(@survey), method: :post, class: "space-y-6") do |form| %>
+        <% if @questions.any? %>
+          <% @questions.each do |question| %>
+            <div class="bg-gray-50 p-4 rounded-md mb-4">
+              <h3 class="text-lg font-medium text-gray-900 mb-2"><%= question.content %></h3>
+              
+              <% case question.question_type %>
+              <% when 'text' %>
+                <div class="mt-1">
+                  <%= text_area_tag "responses[#{question.id}]", nil, rows: 3, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
+                </div>
+              <% when 'multiple_choice' %>
+                <div class="mt-2 space-y-2">
+                  <% ['Option 1', 'Option 2', 'Option 3'].each do |option| %>
+                    <div class="flex items-center">
+                      <%= radio_button_tag "responses[#{question.id}]", option, false, class: "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300" %>
+                      <%= label_tag "responses[#{question.id}]_#{option.parameterize}", option, class: "ml-3 block text-sm font-medium text-gray-700" %>
+                    </div>
+                  <% end %>
+                </div>
+              <% when 'checkbox' %>
+                <div class="mt-2 space-y-2">
+                  <% ['Option 1', 'Option 2', 'Option 3'].each do |option| %>
+                    <div class="flex items-center">
+                      <%= check_box_tag "responses[#{question.id}][]", option, false, id: "responses_#{question.id}_#{option.parameterize}", class: "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded" %>
+                      <%= label_tag "responses_#{question.id}_#{option.parameterize}", option, class: "ml-3 block text-sm font-medium text-gray-700" %>
+                    </div>
+                  <% end %>
+                </div>
+              <% when 'rating' %>
+                <div class="mt-2">
+                  <div class="flex items-center space-x-3">
+                    <% (1..5).each do |rating| %>
+                      <div>
+                        <%= radio_button_tag "responses[#{question.id}]", rating, false, class: "focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300" %>
+                        <%= label_tag "responses[#{question.id}]_#{rating}", rating, class: "block text-sm font-medium text-gray-700 text-center" %>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+          
+          <div class="flex justify-end">
+            <%= link_to "Cancel", surveys_path, class: "bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+            <%= form.submit "Submit Responses", class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          </div>
+        <% else %>
+          <div class="text-center py-4">
+            <p class="text-gray-500">This survey doesn't have any questions yet.</p>
+            <%= link_to "Back to Surveys", surveys_path, class: "mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          </div>
+        <% end %>
+      <% end %>
+    </noscript>
+  </div>
+</div> 
