@@ -142,7 +142,6 @@ const TakeSurvey = (props) => {
         body: JSON.stringify({
           response: {
             survey_id: survey.id,
-            survey_version: survey.version,
             question_responses_attributes: formattedResponses
           }
         })

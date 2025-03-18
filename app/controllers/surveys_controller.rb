@@ -38,26 +38,16 @@ class SurveysController < ApplicationController
     redirect_to surveys_url, notice: 'Survey was successfully destroyed.'
   end
   
-  # Action for taking a survey
   def take
-    # This is where the A/B testing logic would be implemented by the candidate
-    # For now, we'll just render the survey
     @questions = @survey.questions.order(:position)
-    
-    # Placeholder for A/B testing - this will be implemented by the candidate
-    # Randomly assign version A or B
-    @survey_version = ['A', 'B'].sample
   end
   
-  # Action for submitting survey responses
   def submit
-    # Process the submitted responses
     if params[:responses].present?
       params[:responses].each do |response_params|
         @survey.responses.create(
           question_id: response_params[:question_id],
           value: response_params[:value],
-          survey_version: response_params[:survey_version]
         )
       end
       redirect_to surveys_path, notice: 'Thank you for completing the survey!'
