@@ -3,14 +3,14 @@
 This is a coding challenge created by DX. It houses a basic survey application that will serve as the basis for the challenge.
 
 ## Challenge Description
-The scenario: We want to be able run surveys and effectively test how different versions of the same question perform. The versions can differ in the way the questions are phrased in the prompt and/or the options.
+The scenario: We want to be able customize questions in the survey depending on the role of the person responding (i.e. Data Engineer, Frontend Engineer, Product Manager, etc.).
 
 Here's what we'd like to see:
-* Implement a UI to manage A/B testing for different survey question phrasings
-* Update the respondent experience to take A/B testing into account
-* Add a way to easily analyze the response data between different variants
+* Implement a way to define the different branches of a survey and the questions that are shown or hidden for each branch
+* Update the respondent experience to collect their role and then display the appropriate questions based on the branch
+* (If time allows) Add a way to analyze the response data between the different branches
 
-The boilerplate code provides a very basic survey application with the ability to create surveys, add questions, and collect responses. Your job is to extend this functionality to support A/B testing.
+The boilerplate code provides a very basic survey application with the ability to create surveys, add questions, and collect responses. Your job is to extend this functionality to support branching.
 
 Any and all existing code or seed data can be edited in any way. Anything that's here is purely to serve as a functional starting point to begin building off of.
 
@@ -59,7 +59,26 @@ The purpose of this exercise is to evaluate how you would implement a moderately
 
 4. Install Node.js
    ```bash
-   brew install node
+   # Install nvm (Node Version Manager) for better Node.js version management
+   brew install nvm
+   
+   # Create NVM's working directory if it doesn't exist
+   mkdir -p ~/.nvm
+   
+   # Add NVM to your shell profile
+   echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.zshrc
+   echo '[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"' >> ~/.zshrc
+   echo '[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"' >> ~/.zshrc
+   
+   # Source the updated profile
+   source ~/.zshrc
+   
+   # Install and use Node.js version 20 (compatible with the project dependencies)
+   nvm install 20
+   nvm use 20
+   
+   # Verify installation
+   node -v
    ```
 
 #### Project Setup
