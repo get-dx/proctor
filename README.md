@@ -8,7 +8,7 @@ Your task is to implement A/B testing functionality in this application.
 
 The boilerplate code provides a very basic survey application with the ability to create surveys, add questions, and collect responses. Your job is to extend this functionality to support A/B testing.
 
-Here are a few ideas of things that you could do to accomplish this:
+Here's what we'd like to see:
 * Implement a UI to manage A/B testing for different survey question phrasings
 * Update the respondent experience to take A/B testing into account
 * Add a way to easily analyze the response data between different variants
