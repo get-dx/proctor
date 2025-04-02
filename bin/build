@@ -4,11 +4,11 @@
 set -e
 
 # Build JavaScript and CSS
-yarn build
-yarn build:css
+npm run build
+npm run build:css
 
 # If watch flag is provided, run in watch mode
 if [ "$1" == "--watch" ] || [ "$1" == "-w" ]; then
   echo "Starting watch mode..."
-  yarn dev
-fi 
+  npm run dev
+fi

@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 
-if ! command -v foreman &> /dev/null
-then
-  echo "Installing foreman..."
-  gem install foreman
-fi
-
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
 # Start the development server and asset compilation
-exec foreman start -f Procfile.dev "$@" 
+exec bundle exec foreman start -f Procfile.dev "$@"
