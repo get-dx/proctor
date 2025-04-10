@@ -21,7 +21,9 @@
     <div id="question-list-container" 
          data-survey-id="<%= @survey.id %>" 
          data-questions="<%= @survey.questions.order(:position).to_json %>"
-         data-autoload="false">
+         data-autoload="true"
+         data-variations="<%= @variations %>"
+         >
     </div>
 
     <!-- Fallback for when JavaScript is disabled -->

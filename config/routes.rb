@@ -7,8 +7,11 @@ Rails.application.routes.draw do
   # RESTful routes for surveys
   resources :surveys do
     # Nested routes for questions
-    resources :questions, except: [:index, :show]
+    resources :questions
     
+    # Nested routes for survey variations
+    resources :survey_variations, only: [:create, :index, :show, :update, :destroy]
+
     # Route for taking a survey
     member do
       get 'take'

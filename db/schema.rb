@@ -23,7 +23,9 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_17_163201) do
     t.datetime "updated_at", null: false
     t.text "options"
     t.boolean "required"
+    t.bigint "survey_variation_id"
     t.index ["survey_id"], name: "index_questions_on_survey_id"
+    t.index ["survey_variation_id"], name: "index_questions_on_survey_variation_id"
   end
 
   create_table "responses", force: :cascade do |t|
@@ -36,6 +38,14 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_17_163201) do
     t.index ["survey_id"], name: "index_responses_on_survey_id"
   end
 
+  create_table "survey_variations", force: :cascade do |t|
+    t.bigint "survey_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["survey_id"], name: "index_survey_variations_on_survey_id"
+  end
+
   create_table "surveys", force: :cascade do |t|
     t.string "title"
     t.text "description"
@@ -43,7 +53,9 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_17_163201) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "questions", "survey_variations"
   add_foreign_key "questions", "surveys"
   add_foreign_key "responses", "questions"
   add_foreign_key "responses", "surveys"
+  add_foreign_key "survey_variations", "surveys"
 end

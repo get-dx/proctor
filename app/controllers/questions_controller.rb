@@ -2,6 +2,12 @@ class QuestionsController < ApplicationController
   before_action :set_survey
   before_action :set_question, only: [:edit, :update, :destroy]
 
+  def index
+    survey = Survey.find(params[:survey_id])
+    questions = survey.questions
+    render json: questions, status: :ok
+  end
+  
   def new
     @question = @survey.questions.new
   end
