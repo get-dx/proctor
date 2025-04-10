@@ -40,6 +40,7 @@ class SurveysController < ApplicationController
   
   def take
     @questions = @survey.questions.order(:position)
+    @variations = @survey.survey_variations.includes(:questions)
   end
   
   def submit

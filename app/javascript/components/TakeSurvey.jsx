@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 
 const TextQuestion = ({ question, onChange }) => {
@@ -96,16 +96,30 @@ const RatingQuestion = ({ question, onChange }) => {
 };
 
 const TakeSurvey = (props) => {
-  const { survey, questions } = props;
+  const { survey, questions, variations } = props;
   const [responses, setResponses] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState([]);
   const [submitted, setSubmitted] = useState(false);
+  const [selectedVariation, setSelectedVariation] = useState(null);
+  const [filteredQuestions, setFilteredQuestions] = useState(questions);
+
+  useEffect(() => {
+    // Filter questions based on the selected variation
+    if (selectedVariation) {
+      const variation = variations.find((v) => v.id === parseInt(selectedVariation));
+      if (variation) {
+        setFilteredQuestions(questions.filter((q) => variation.question_ids.includes(q.id)));
+      }
+    } else {
+      setFilteredQuestions(questions); // Show all questions if no variation is selected
+    }
+  }, [selectedVariation, variations, questions]);
 
   const handleInputChange = (questionId, value) => {
     setResponses({
       ...responses,
-      [questionId]: value
+      [questionId]: value,
     });
   };
 
@@ -115,9 +129,9 @@ const TakeSurvey = (props) => {
     setErrors([]);
 
     // Validate responses
-    const requiredQuestions = questions.filter(q => q.required);
-    const missingResponses = requiredQuestions.filter(q => !responses[q.id]);
-    
+    const requiredQuestions = filteredQuestions.filter((q) => q.required);
+    const missingResponses = requiredQuestions.filter((q) => !responses[q.id]);
+
     if (missingResponses.length > 0) {
       setErrors(['Please answer all required questions.']);
       setSubmitting(false);
@@ -125,26 +139,26 @@ const TakeSurvey = (props) => {
     }
 
     // Format response data
-    const formattedResponses = Object.keys(responses).map(questionId => ({
+    const formattedResponses = Object.keys(responses).map((questionId) => ({
       question_id: questionId,
-      content: responses[questionId]
+      content: responses[questionId],
     }));
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    
+
     try {
       const response = await fetch(`/surveys/${survey.id}/responses`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken
+          'X-CSRF-Token': csrfToken,
         },
         body: JSON.stringify({
           response: {
             survey_id: survey.id,
-            question_responses_attributes: formattedResponses
-          }
-        })
+            question_responses_attributes: formattedResponses,
+          },
+        }),
       });
 
       if (response.ok) {
@@ -343,7 +357,28 @@ const TakeSurvey = (props) => {
     <div>
       <h1 className="text-2xl font-bold mb-4">{survey.title}</h1>
       <p className="mb-6">{survey.description}</p>
-      
+
+      {variations.length > 0 && (
+        <div className="mb-6">
+          <label htmlFor="variation-select" className="block text-sm font-medium text-gray-700">
+            Select a Variation:
+          </label>
+          <select
+            id="variation-select"
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            value={selectedVariation || ''}
+            onChange={(e) => setSelectedVariation(e.target.value)}
+          >
+            <option value="">All Questions</option>
+            {variations.map((variation) => (
+              <option key={variation.id} value={variation.id}>
+                {variation.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {errors.length > 0 && (
         <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
           <div className="flex">
@@ -362,15 +397,14 @@ const TakeSurvey = (props) => {
           </div>
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit}>
-      // TODO: Add variation filtering
-        {questions.map(question => (
+        {filteredQuestions.map((question) => (
           <div key={question.id} className="mb-6 p-4 bg-white shadow rounded">
             {renderQuestion(question)}
           </div>
         ))}
-        
+
         <div className="mt-6">
           <button
             type="submit"
@@ -391,16 +425,14 @@ const initializeTakeSurvey = () => {
   if (container && !container.hasAttribute('data-react-initialized')) {
     const surveyData = JSON.parse(container.dataset.survey || '{}');
     const questionsData = JSON.parse(container.dataset.questions || '[]');
-    
+    const variationsData = JSON.parse(container.dataset.variations || '[]');
+
     // Mark as initialized to prevent double initialization
     container.setAttribute('data-react-initialized', 'true');
-    
+
     const root = createRoot(container);
     root.render(
-      <TakeSurvey 
-        survey={surveyData} 
-        questions={questionsData}
-      />
+      <TakeSurvey survey={surveyData} questions={questionsData} variations={variationsData} />
     );
   }
 };
@@ -414,4 +446,4 @@ document.addEventListener('DOMContentLoaded', initializeTakeSurvey);
 // Additionally listen for turbo:load event if using Turbo
 document.addEventListener('turbo:load', initializeTakeSurvey);
 
-export default TakeSurvey; 
+export default TakeSurvey;

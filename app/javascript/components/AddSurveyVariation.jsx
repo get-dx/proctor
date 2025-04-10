@@ -56,8 +56,9 @@ const AddSurveyVariation = ({ surveyId, variation, onVariationAdded, onVariation
 
       const data = await response.json();
       if (variation) {
+        variation = data;
         onVariationUpdated(data); // Notify parent component of the updated variation
-        setName(""); // Reset the form
+        toggleEditing(variation)
       } else {
         onVariationAdded(data); // Notify parent component of the new variation
       }
@@ -91,6 +92,8 @@ const AddSurveyVariation = ({ surveyId, variation, onVariationAdded, onVariation
 
       alert("Survey variation deleted successfully");
       onVariationDeleted(variationId); // Notify parent component to remove the variation from the list
+      setEditingVariation(-1); // Close the form
+      toggleEditing()
     } catch (err) {
       console.error("Error deleting survey variation:", err);
       alert("An error occurred while deleting the survey variation.");
@@ -130,10 +133,15 @@ const AddSurveyVariation = ({ surveyId, variation, onVariationAdded, onVariation
 
   const classNames = `inline-flex items-center ${variation ? 'ml-2' : ''} px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700`
 
-  // if (editingVariationId >= 0 && editingVariationId !== variation.id){
-  //   console.log("Editing variation:", variation.id);
-  //   return null; // Don't render if another variation is being edited
-  // }
+  const buttonBaseClass =
+  "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2";
+
+  const buttonColors = {
+    primary: "text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500",
+    secondary: "text-gray-700 bg-white border-gray-300 hover:bg-gray-50 focus:ring-indigo-500",
+    danger: "text-white bg-red-600 hover:bg-red-700 focus:ring-red-500",
+  };
+
   return (
     <div>
       {
@@ -142,7 +150,7 @@ const AddSurveyVariation = ({ surveyId, variation, onVariationAdded, onVariation
             className={classNames}
             onClick={() => { toggleEditing(variation) }}
           >
-            {variation ? `Edit Variation (${name})` : "Add a Variation"} {editingVariationId}
+            {variation ? `Edit Variation (${name})` : "Add a Variation"}
           </button>
           : null
       }
@@ -178,14 +186,26 @@ const AddSurveyVariation = ({ surveyId, variation, onVariationAdded, onVariation
               ))}
             </ul>
           </div>
-          <button onClick={() => { toggleEditing(variation) }} className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
+          <button
+            onClick={() => {
+              toggleEditing(variation);
+            }}
+            className={`${buttonBaseClass} ${buttonColors.secondary}`}
+            >
+            Cancel
+          </button>
 
-          <button className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" type="submit" disabled={loading}>
+          <button
+            className={`${buttonBaseClass} ${buttonColors.primary} ml-3`}
+            type="submit"
+            disabled={loading}
+          >
             {loading ? (variation ? "Updating..." : "Adding...") : variation ? "Update Variation" : "Add Variation"}
           </button>
+
           {variation ?
             <button
-              className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+              className={`${buttonBaseClass} ${buttonColors.danger} ml-3`}
               onClick={() => handleDelete(variation.id)}
             >
               Delete

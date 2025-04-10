@@ -7,7 +7,7 @@ const QuestionList = (props) => {
   const [variations, setVariations] = useState(props.variations || []);
   const [loading, setLoading] = useState(false);
   const [editingVariation, setEditingVariation] = useState(-1);
-  const [addingVariation, setAddingVariation] = useState(-1);
+  // const [addingVariation, setAddingVariation] = useState(-1);
 
   const handleVariationAdded = (newVariation) => {
     setVariations((prev) => [...prev, newVariation]);
@@ -15,8 +15,11 @@ const QuestionList = (props) => {
 
   const handleVariationUpdated = (updatedVariation) => {
     setVariations((prev) =>
-      prev.map((v) => (v.id === updatedVariation.id ? updatedVariation : v))
+      [...prev.map((v) => {
+        return (v.id === updatedVariation.id ? updatedVariation : v)
+      })]
     );
+    console.log('handleVariationUpdated', updatedVariation, variations)
   };
 
   const handleVariationDeleted = (deletedVariationId) => {
@@ -105,7 +108,6 @@ const QuestionList = (props) => {
 
   return (
     <div>
-      <div>editingVariation: {editingVariation}</div>
       <div className="inline-flex items-center">
         <AddSurveyVariation
           surveyId={props.surveyId}
