@@ -147,7 +147,7 @@ const TakeSurvey = (props) => {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
     try {
-      const response = await fetch(`/surveys/${survey.id}/responses`, {
+      const response = await fetch(`/surveys/${survey.id}/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
