@@ -102,17 +102,22 @@ const TakeSurvey = (props) => {
   const [errors, setErrors] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [selectedVariation, setSelectedVariation] = useState(null);
-  const [filteredQuestions, setFilteredQuestions] = useState(questions);
+  const [filteredQuestions, setFilteredQuestions] = useState([]);
+  const [variationConfirmed, setVariationConfirmed] = useState(false);
 
   useEffect(() => {
-    // Filter questions based on the selected variation
     if (selectedVariation) {
       const variation = variations.find((v) => v.id === parseInt(selectedVariation));
       if (variation) {
         setFilteredQuestions(questions.filter((q) => variation.question_ids.includes(q.id)));
       }
     } else {
-      setFilteredQuestions(questions); // Show all questions if no variation is selected
+      setFilteredQuestions(questions);
+    }
+    
+    if (variations.length === 0) {
+      setVariationConfirmed(true)
+
     }
   }, [selectedVariation, variations, questions]);
 
@@ -174,6 +179,10 @@ const TakeSurvey = (props) => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleVariationConfirm = () => {
+    setVariationConfirmed(true);
   };
 
   const renderQuestion = (question) => {
@@ -358,10 +367,10 @@ const TakeSurvey = (props) => {
       <h1 className="text-2xl font-bold mb-4">{survey.title}</h1>
       <p className="mb-6">{survey.description}</p>
 
-      {variations.length > 0 && (
+      {!variationConfirmed && variations.length > 0 && (
         <div className="mb-6">
           <label htmlFor="variation-select" className="block text-sm font-medium text-gray-700">
-            Select a Variation:
+            What role are you taking this survey for?
           </label>
           <select
             id="variation-select"
@@ -369,14 +378,41 @@ const TakeSurvey = (props) => {
             value={selectedVariation || ''}
             onChange={(e) => setSelectedVariation(e.target.value)}
           >
-            <option value="">All Questions</option>
+            <option value="">Select a Role</option>
             {variations.map((variation) => (
               <option key={variation.id} value={variation.id}>
                 {variation.name}
               </option>
             ))}
           </select>
+          <button
+            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            onClick={handleVariationConfirm}
+            disabled={!selectedVariation}
+          >
+            Next
+          </button>
         </div>
+      )}
+
+      {variationConfirmed && (
+        <form onSubmit={handleSubmit}>
+          {filteredQuestions.map((question) => (
+            <div key={question.id} className="mb-6 p-4 bg-white shadow rounded">
+              {renderQuestion(question)}
+            </div>
+          ))}
+
+          <div className="mt-6">
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              disabled={submitting}
+            >
+              {submitting ? 'Submitting...' : 'Submit Response'}
+            </button>
+          </div>
+        </form>
       )}
 
       {errors.length > 0 && (
@@ -397,24 +433,6 @@ const TakeSurvey = (props) => {
           </div>
         </div>
       )}
-
-      <form onSubmit={handleSubmit}>
-        {filteredQuestions.map((question) => (
-          <div key={question.id} className="mb-6 p-4 bg-white shadow rounded">
-            {renderQuestion(question)}
-          </div>
-        ))}
-
-        <div className="mt-6">
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            disabled={submitting}
-          >
-            {submitting ? 'Submitting...' : 'Submit Response'}
-          </button>
-        </div>
-      </form>
     </div>
   );
 };
