@@ -14,8 +14,7 @@ Rails.application.routes.draw do
       get 'take'
       post 'submit'
     end
+    # Route for creating responses
+    resources :responses, only: [:create]
   end
-  
-  # Route for creating responses
-  resources :responses, only: [:create]
 end
