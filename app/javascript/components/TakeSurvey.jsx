@@ -96,7 +96,7 @@ const RatingQuestion = ({ question, onChange }) => {
 };
 
 const TakeSurvey = (props) => {
-  const { survey, questions } = props;
+  const { survey, role, questions } = props;
   const [responses, setResponses] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -127,13 +127,13 @@ const TakeSurvey = (props) => {
     // Format response data
     const formattedResponses = Object.keys(responses).map(questionId => ({
       question_id: questionId,
-      content: responses[questionId]
+      value: responses[questionId]
     }));
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     
     try {
-      const response = await fetch(`/surveys/${survey.id}/responses`, {
+      const response = await fetch(`/surveys/${survey.id}/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +142,8 @@ const TakeSurvey = (props) => {
         body: JSON.stringify({
           response: {
             survey_id: survey.id,
-            question_responses_attributes: formattedResponses
+            role: role,
+            responses: formattedResponses
           }
         })
       });
@@ -341,9 +342,6 @@ const TakeSurvey = (props) => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">{survey.title}</h1>
-      <p className="mb-6">{survey.description}</p>
-      
       {errors.length > 0 && (
         <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
           <div className="flex">
@@ -390,6 +388,7 @@ const initializeTakeSurvey = () => {
   if (container && !container.hasAttribute('data-react-initialized')) {
     const surveyData = JSON.parse(container.dataset.survey || '{}');
     const questionsData = JSON.parse(container.dataset.questions || '[]');
+    const roleId = new URLSearchParams(document.location.search).get("role");
     
     // Mark as initialized to prevent double initialization
     container.setAttribute('data-react-initialized', 'true');
@@ -398,6 +397,7 @@ const initializeTakeSurvey = () => {
     root.render(
       <TakeSurvey 
         survey={surveyData} 
+        role={roleId}
         questions={questionsData}
       />
     );

@@ -1,6 +1,10 @@
 class Question < ApplicationRecord
   belongs_to :survey
   has_many :responses, dependent: :destroy
+  has_many :question_role, dependent: :destroy
+  has_many :roles, through: :question_role, dependent: :destroy
+
+  accepts_nested_attributes_for :roles
   
   validates :content, presence: true
   validates :question_type, presence: true

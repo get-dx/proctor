@@ -10,9 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_03_17_163201) do
+ActiveRecord::Schema[7.0].define(version: 2025_04_15_165740) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "question_roles", force: :cascade do |t|
+    t.bigint "question_id"
+    t.bigint "role_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["question_id"], name: "index_question_roles_on_question_id"
+    t.index ["role_id"], name: "index_question_roles_on_role_id"
+  end
 
   create_table "questions", force: :cascade do |t|
     t.bigint "survey_id", null: false
@@ -26,6 +35,15 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_17_163201) do
     t.index ["survey_id"], name: "index_questions_on_survey_id"
   end
 
+  create_table "response_roles", force: :cascade do |t|
+    t.bigint "response_id"
+    t.bigint "role_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["response_id"], name: "index_response_roles_on_response_id"
+    t.index ["role_id"], name: "index_response_roles_on_role_id"
+  end
+
   create_table "responses", force: :cascade do |t|
     t.bigint "survey_id", null: false
     t.bigint "question_id", null: false
@@ -36,11 +54,18 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_17_163201) do
     t.index ["survey_id"], name: "index_responses_on_survey_id"
   end
 
+  create_table "roles", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "surveys", force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "question_branches", default: {}
   end
 
   add_foreign_key "questions", "surveys"

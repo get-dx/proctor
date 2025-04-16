@@ -1,5 +1,6 @@
 class QuestionsController < ApplicationController
   before_action :set_survey
+  before_action :set_roles, only: [:new, :edit]
   before_action :set_question, only: [:edit, :update, :destroy]
 
   def new
@@ -35,7 +36,7 @@ class QuestionsController < ApplicationController
 
   def destroy
     @question.destroy
-    redirect_to survey_path(@survey), notice: 'Question was successfully destroyed.'
+    redirect_to survey_path(@survey), notice: 'Question was successfully destroyed.', status: 303
   end
   
   private
@@ -43,13 +44,17 @@ class QuestionsController < ApplicationController
   def set_survey
     @survey = Survey.find(params[:survey_id])
   end
-  
+
+  def set_roles
+    @roles = Role.all
+  end 
+
   def set_question
     @question = @survey.questions.find(params[:id])
   end
   
   def question_params
-    params.require(:question).permit(:content, :question_type, :position, :required, options: [])
+    params.require(:question).permit(:content, :question_type, :position, :required, options: [], role_ids: [])
   end
   
   def process_options

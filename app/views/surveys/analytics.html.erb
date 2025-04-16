@@ -1,0 +1,62 @@
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900"><%= @survey.title %></h1>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500"><%= @survey.description %></p>
+    </div>
+    <div class="flex space-x-2">
+      <%= link_to "Edit", edit_survey_path(@survey), class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200" %>
+      <%= link_to "Take Survey", take_survey_path(@survey), class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200" %>
+      <%= link_to "Analytics", analytics_survey_path(@survey), class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200" %>
+      <%= link_to "Back to Surveys", surveys_path, class: "inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+    </div>
+  </div>
+  <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-2">
+        <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+          <dt class="text-base/7 text-gray-600">Total Questions</dt>
+          <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><%= @question_count %></dd>
+        </div>
+        <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+          <dt class="text-base/7 text-gray-600">Total Responses</dt>
+          <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><%= @response_count %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+  <div class="border-gray-200 px-4 py-5 sm:p-6">
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Questions</h1>
+      </div>
+   </div> 
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-4">
+        <% @analytics.each do |analytic| %>
+        <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+          <dt class="text-base/7 text-gray-600"><%= analytic.role %></dt>
+          <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><%= analytic.total_questions %></dd>
+        </div>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+  <div class="border-gray-200 px-4 py-5 sm:p-6">
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Responses</h1>
+      </div>
+   </div> 
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-4">
+        <% @analytics.each do |analytic| %>
+        <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+          <dt class="text-base/7 text-gray-600"><%= analytic.role %></dt>
+          <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><%= analytic.total_responses %></dd>
+        </div>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+</div>

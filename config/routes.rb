@@ -13,9 +13,12 @@ Rails.application.routes.draw do
     member do
       get 'take'
       post 'submit'
+      get 'analytics'
     end
+
+    # Route for creating responses
+    resources :responses, only: [:create]
   end
   
-  # Route for creating responses
-  resources :responses, only: [:create]
+  resources :roles
 end
