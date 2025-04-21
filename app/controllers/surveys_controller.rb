@@ -32,16 +32,19 @@ class SurveysController < ApplicationController
       render :edit, status: :unprocessable_entity
     end
   end
-  
+
   def destroy
     @survey.destroy
     redirect_to surveys_url, notice: 'Survey was successfully destroyed.'
   end
-  
+
   def take
-    @questions = @survey.questions.order(:position)
+    @questions = Questions::Sorter.new(
+      questions: @survey.questions,
+      target_role_name: nil
+    ).perform
   end
-  
+
   def submit
     if params[:responses].present?
       params[:responses].each do |response_params|
@@ -55,13 +58,13 @@ class SurveysController < ApplicationController
       redirect_to take_survey_path(@survey), alert: 'Please answer at least one question.'
     end
   end
-  
+
   private
-  
+
   def set_survey
     @survey = Survey.find(params[:id])
   end
-  
+
   def survey_params
     params.require(:survey).permit(:title, :description)
   end
