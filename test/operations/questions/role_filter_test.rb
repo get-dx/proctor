@@ -54,7 +54,7 @@ class Questions::RoleFilterTest < ActiveSupport::TestCase
     @questions = @survey.questions
     @role_context = Questions::RoleFilter.new(
       questions: @questions,
-      target_role_name: "Frontend Engineer"
+      target_role_name: @fe_role.name
     )
   end
 
@@ -100,7 +100,7 @@ class Questions::RoleFilterTest < ActiveSupport::TestCase
     )
     role_context = Questions::RoleFilter.new(
       questions: survey.questions,
-      target_role_name: "Frontend Engineer"
+      target_role_name: @fe_role.name
     )
     assert_empty role_context.all
   end
