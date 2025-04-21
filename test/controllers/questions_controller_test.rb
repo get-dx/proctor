@@ -7,7 +7,7 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get create" do
-    post survey_questions_url(survey_id: surveys(:one).id), params: { question: { content: "Test question", question_type: "text" } }
+    post survey_questions_url(survey_id: surveys(:one).id), params: {question: {content: "Test question", question_type: "text"}}
     assert_response :redirect
     assert_redirected_to survey_url(surveys(:one))
   end
@@ -18,7 +18,7 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get update" do
-    patch survey_question_url(survey_id: surveys(:one).id, id: questions(:one).id), params: { question: { content: "Updated question" } }
+    patch survey_question_url(survey_id: surveys(:one).id, id: questions(:one).id), params: {question: {content: "Updated question"}}
     assert_response :redirect
     assert_redirected_to survey_url(surveys(:one))
   end

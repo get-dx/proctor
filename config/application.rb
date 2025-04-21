@@ -13,7 +13,7 @@ module Proctor
 
     # Configuration for the application, engines, and railties goes here.
     # Autoload the operation directory
-    config.autoload_paths << Rails.root.join('app', 'operations')
+    config.autoload_paths << Rails.root.join("app", "operations")
 
     #
     # These settings can be overridden in specific environments using the files

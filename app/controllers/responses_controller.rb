@@ -6,12 +6,12 @@ class ResponsesController < ApplicationController
 
     respond_to do |format|
       if result[:responses_saved].all?
-        format.html { redirect_to surveys_path, notice: 'Responses were successfully recorded.' }
-        format.json { render json: { success: true }, status: :created }
+        format.html { redirect_to surveys_path, notice: "Responses were successfully recorded." }
+        format.json { render json: {success: true}, status: :created }
       else
-        error_message = result[:errors].flatten.join(', ')
+        error_message = result[:errors].flatten.join(", ")
         format.html { redirect_to take_survey_path(@survey), alert: "There was an error recording your responses: #{error_message}" }
-        format.json { render json: { error: 'Failed to save responses', details: result[:errors].flatten }, status: :unprocessable_entity }
+        format.json { render json: {error: "Failed to save responses", details: result[:errors].flatten}, status: :unprocessable_entity }
       end
     end
   end
@@ -52,6 +52,6 @@ class ResponsesController < ApplicationController
       end
     end
 
-    { responses_saved: responses_saved, errors: errors }
+    {responses_saved: responses_saved, errors: errors}
   end
 end

@@ -14,8 +14,9 @@ Rails.application.routes.draw do
 
     # Route for taking a survey
     member do
-      get 'take'
-      post 'submit'
+      get "take"
+      get "take_v2(/:question_response_content)", to: "surveys#take_v2", as: "take_v2", defaults: {format: "json"}
+      post "submit"
     end
   end
 

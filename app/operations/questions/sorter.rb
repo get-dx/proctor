@@ -1,6 +1,5 @@
 module Questions
   class Sorter
-
     attr_reader :target_role_name
 
     def initialize(questions:, target_role_name: nil, hide_first_question: false)

@@ -1,5 +1,5 @@
 class SurveysController < ApplicationController
-  before_action :set_survey, only: [:show, :edit, :update, :destroy, :take, :submit]
+  before_action :set_survey, only: [:show, :edit, :update, :destroy, :take, :take_v2, :submit]
   before_action :create_role_default_question, only: [:submit, :take]
 
   def index
@@ -17,7 +17,7 @@ class SurveysController < ApplicationController
     @survey = Survey.new(survey_params)
 
     if @survey.save
-      redirect_to @survey, notice: 'Survey was successfully created.'
+      redirect_to @survey, notice: "Survey was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -28,7 +28,7 @@ class SurveysController < ApplicationController
 
   def update
     if @survey.update(survey_params)
-      redirect_to @survey, notice: 'Survey was successfully updated.'
+      redirect_to @survey, notice: "Survey was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -36,7 +36,16 @@ class SurveysController < ApplicationController
 
   def destroy
     @survey.destroy
-    redirect_to surveys_url, notice: 'Survey was successfully destroyed.'
+    redirect_to surveys_url, notice: "Survey was successfully destroyed."
+  end
+
+  def take_v2
+    @questions = Questions::Sorter.new(
+      questions: @survey.questions,
+      target_role_name: params[:question_response_content],
+      hide_first_question: true
+    ).perform
+    render json: {data: @questions}
   end
 
   def take
@@ -51,12 +60,12 @@ class SurveysController < ApplicationController
       params[:responses].each do |response_params|
         @survey.responses.create(
           question_id: response_params[:question_id],
-          value: response_params[:value],
+          value: response_params[:value]
         )
       end
-      redirect_to surveys_path, notice: 'Thank you for completing the survey!'
+      redirect_to surveys_path, notice: "Thank you for completing the survey!"
     else
-      redirect_to take_survey_path(@survey), alert: 'Please answer at least one question.'
+      redirect_to take_survey_path(@survey), alert: "Please answer at least one question."
     end
   end
 

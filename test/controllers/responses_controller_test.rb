@@ -16,7 +16,7 @@ class ResponsesControllerTest < ActionDispatch::IntegrationTest
     }
     assert_response :redirect
     assert_redirected_to surveys_url
-    assert_equal 'Responses were successfully recorded.', flash[:notice]
+    assert_equal "Responses were successfully recorded.", flash[:notice]
   end
 
   test "should create responses via JSON" do
@@ -33,7 +33,7 @@ class ResponsesControllerTest < ActionDispatch::IntegrationTest
       }
     }, as: :json
     assert_response :created
-    assert_equal({ "success" => true }, JSON.parse(response.body))
+    assert_equal({"success" => true}, JSON.parse(response.body))
   end
 
   test "should create responses via nested route" do
@@ -49,7 +49,7 @@ class ResponsesControllerTest < ActionDispatch::IntegrationTest
     }
     assert_response :redirect
     assert_redirected_to surveys_url
-    assert_equal 'Responses were successfully recorded.', flash[:notice]
+    assert_equal "Responses were successfully recorded.", flash[:notice]
   end
 
   test "should create responses via nested route as JSON" do
@@ -64,7 +64,7 @@ class ResponsesControllerTest < ActionDispatch::IntegrationTest
       }
     }, as: :json
     assert_response :created
-    assert_equal({ "success" => true }, JSON.parse(response.body))
+    assert_equal({"success" => true}, JSON.parse(response.body))
   end
 
   test "should handle errors when responses fail to save" do

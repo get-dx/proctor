@@ -7,7 +7,7 @@ class Question < ApplicationRecord
   validates :question_type, presence: true
 
   # Define question types
-  QUESTION_TYPES = ['text', 'long_text', 'multiple_choice', 'checkbox', 'rating'].freeze
+  QUESTION_TYPES = ["text", "long_text", "multiple_choice", "checkbox", "rating"].freeze
 
   DEFAULT_ROLE_TEXT = "What best describes your current role?"
   # Ensure position is maintained within a survey
@@ -22,7 +22,7 @@ class Question < ApplicationRecord
   private
 
   def validate_options_for_question_type
-    if ['multiple_choice', 'checkbox'].include?(question_type) && (options.nil? || options.empty?)
+    if ["multiple_choice", "checkbox"].include?(question_type) && (options.nil? || options.empty?)
       errors.add(:options, "can't be blank for #{question_type} questions")
     end
   end

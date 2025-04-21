@@ -25,7 +25,7 @@ module Questions
     private
 
     def no_role_questions?
-      questions.all? {|question| question.role_id.nil?}
+      questions.all? { |question| question.role_id.nil? }
     end
 
     def questions
