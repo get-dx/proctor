@@ -2,22 +2,23 @@ require "test_helper"
 
 class SurveysControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
-    get surveys_index_url
+    get surveys_url
     assert_response :success
   end
 
   test "should get show" do
-    get surveys_show_url
+    get survey_url(surveys(:one))
     assert_response :success
   end
 
   test "should get new" do
-    get surveys_new_url
+    get new_survey_url
     assert_response :success
   end
 
   test "should get create" do
-    get surveys_create_url
-    assert_response :success
+    post surveys_url, params: { survey: { title: "Taco", description: "Cat" } }
+    assert_response :redirect
+    assert_redirected_to survey_url(Survey.last)
   end
 end

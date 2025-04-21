@@ -2,27 +2,30 @@ require "test_helper"
 
 class QuestionsControllerTest < ActionDispatch::IntegrationTest
   test "should get new" do
-    get questions_new_url
+    get new_survey_question_url(survey_id: surveys(:one).id)
     assert_response :success
   end
 
   test "should get create" do
-    get questions_create_url
-    assert_response :success
+    post survey_questions_url(survey_id: surveys(:one).id), params: { question: { content: "Test question", question_type: "text" } }
+    assert_response :redirect
+    assert_redirected_to survey_url(surveys(:one))
   end
 
   test "should get edit" do
-    get questions_edit_url
+    get edit_survey_question_url(survey_id: surveys(:one).id, id: questions(:one).id)
     assert_response :success
   end
 
   test "should get update" do
-    get questions_update_url
-    assert_response :success
+    patch survey_question_url(survey_id: surveys(:one).id, id: questions(:one).id), params: { question: { content: "Updated question" } }
+    assert_response :redirect
+    assert_redirected_to survey_url(surveys(:one))
   end
 
   test "should get destroy" do
-    get questions_destroy_url
-    assert_response :success
+    delete survey_question_url(survey_id: surveys(:one).id, id: questions(:one).id)
+    assert_response :redirect
+    assert_redirected_to survey_url(surveys(:one))
   end
 end
