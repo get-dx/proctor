@@ -33,7 +33,7 @@ gem "acts_as_list"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
-gem 'concurrent-ruby', '1.3.4' 
+gem 'concurrent-ruby', '1.3.4'
 
 # Use Redis adapter to run Action Cable in production
 # gem "redis", "~> 4.0"
@@ -76,7 +76,7 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
-
+  gem "shoulda"
 end
 
 gem "foreman", "~> 0.88.1", :group => :development
