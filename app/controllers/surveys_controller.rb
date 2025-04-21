@@ -21,10 +21,10 @@ class SurveysController < ApplicationController
       render :new, status: :unprocessable_entity
     end
   end
-  
+
   def edit
   end
-  
+
   def update
     if @survey.update(survey_params)
       redirect_to @survey, notice: 'Survey was successfully updated.'

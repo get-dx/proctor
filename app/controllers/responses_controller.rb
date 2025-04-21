@@ -2,6 +2,7 @@ class ResponsesController < ApplicationController
   def create
     @survey = Survey.find(params[:survey_id])
     @response = Response.new(response_params)
+    @response.survey = @survey if params[:survey_id]
 
     respond_to do |format|
       if @response.save
@@ -13,9 +14,9 @@ class ResponsesController < ApplicationController
       end
     end
   end
-  
+
   private
-  
+
   def response_params
     params.require(:response).permit(:survey_id, :question_id, :value)
   end
