@@ -17,38 +17,30 @@ class Questions::SorterTest < ActiveSupport::TestCase
 
     questions = [
       {
-        content: "What best describes your current role?",
-        question_type: "checkbox",
-        position: 1,
-        required: true,
-        options: ["Frontend Engineer", "Backend Engineer", "Product Manager"],
-        role_id: nil
-      },
-      {
         content: "What’s the most ridiculous feature request you’ve ever gotten from a stakeholder, and how did you handle it?",
         question_type: "text",
-        position: 2,
+        position: 1,
         required: false,
         role_id: @pm_role.id
       },
       {
         content: "How do you feel when a designer hands you a 12-column layout for a mobile screen?",
         question_type: "text",
-        position: 3,
+        position: 2,
         required: false,
         role_id: @fe_role.id
       },
       {
         content: "What’s the most cursed error message you’ve ever seen in a log file, and how did it haunt you?",
         question_type: "text",
-        position: 4,
+        position: 3,
         required: false,
         role_id: @be_role.id
       },
       {
         content: "If we did a team dinner, what type of restaurant would you want to dine at?",
         question_type: "multiple_choice",
-        position: 5,
+        position: 4,
         required: false,
         options: ["Mexican", "Indian", "Chinese", "Something else"],
         role_id: nil
@@ -56,7 +48,7 @@ class Questions::SorterTest < ActiveSupport::TestCase
       {
         content: "What’s your go-to move when a sprint is behind but the client wants a demo tomorrow?",
         question_type: "text",
-        position: 6,
+        position: 5,
         required: false,
         options: ["Show a mockup and call it almost done", "Blame unforeseen technical debt", "Rally the team for an all-nighter with pizza"],
         role_id: @pm_role.id
@@ -88,7 +80,7 @@ class Questions::SorterTest < ActiveSupport::TestCase
     result = sorter.perform
     expected_question_ids = @questions.where(role_id: [@fe_role.id, nil]).order(:position).pluck(:id)
     assert_equal expected_question_ids, result.pluck(:id)
-    assert_equal [1, 3, 5], result.pluck(:position)
+    assert_equal [2, 4], result.pluck(:position)
   end
 
   test "perform returns questions for another role and nil role_id, ordered by position" do
@@ -96,7 +88,7 @@ class Questions::SorterTest < ActiveSupport::TestCase
     result = sorter.perform
     expected_question_ids = @questions.where(role_id: [@pm_role.id, nil]).order(:position).pluck(:id)
     assert_equal expected_question_ids, result.pluck(:id)
-    assert_equal [1, 2, 5, 6], result.pluck(:position)
+    assert_equal [1, 4, 5], result.pluck(:position)
   end
 
   test "grouped_hidden_questions_by_role_name returns a Hash of questions for roles other than the target role, grouped by role name and ordered by position" do
@@ -120,7 +112,7 @@ class Questions::SorterTest < ActiveSupport::TestCase
     end
 
     all_result_questions = result.values.flatten.sort_by(&:position)
-    assert_equal [2, 4, 6], all_result_questions.pluck(:position)
+    assert_equal [1, 3, 5], all_result_questions.pluck(:position)
   end
 
   test "grouped_hidden_questions_by_role_name returns empty result when no questions exist for other roles" do

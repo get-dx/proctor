@@ -9,6 +9,7 @@ class Question < ApplicationRecord
   # Define question types
   QUESTION_TYPES = ['text', 'long_text', 'multiple_choice', 'checkbox', 'rating'].freeze
 
+  DEFAULT_ROLE_TEXT = "What best describes your current role?"
   # Ensure position is maintained within a survey
   acts_as_list scope: :survey
 

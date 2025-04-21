@@ -17,14 +17,6 @@ class Questions::RoleFilterTest < ActiveSupport::TestCase
 
     questions = [
       {
-        content: "What best describes your current role?",
-        question_type: "checkbox",
-        position: 1,
-        required: true,
-        options: ["Frontend Engineer", "Backend Engineer", "Product Manager"],
-        role_id: nil
-      },
-      {
         content: "What’s the most ridiculous feature request you’ve ever gotten?",
         question_type: "text",
         position: 2,
