@@ -1,11 +1,12 @@
 module Questions
   class Sorter
 
-    attr_reader :questions, :target_role_name
+    attr_reader :target_role_name
 
-    def initialize(questions:, target_role_name: nil)
+    def initialize(questions:, target_role_name: nil, hide_first_question: false)
       @questions = questions
       @target_role_name = target_role_name
+      @hide_first_question = hide_first_question
     end
 
     def perform
@@ -27,6 +28,8 @@ module Questions
 
     private
 
+    attr_reader :questions, :hide_first_question
+
     def hidden_questions
       return Question.none if questions.nil?
       other_role_ids = question_role_context.others.pluck(:id)
@@ -35,9 +38,17 @@ module Questions
     end
 
     def target_role_order
-      # any question that doesn't have a role is treated as a question
-      # that all roles should answer
-      questions.where(role_id: [question_role_context.target.id, nil]).order(:position)
+      if hide_first_question
+        role_specific_and_general_questions.where.not(position: 1).order(:position)
+      else
+        role_specific_and_general_questions.order(:position)
+      end
+    end
+
+    # any question that doesn't have a role is treated as a question
+    # that all roles should answer
+    def role_specific_and_general_questions
+      questions.where(role_id: [question_role_context.target.id, nil])
     end
 
     def default_order

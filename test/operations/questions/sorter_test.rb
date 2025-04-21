@@ -59,11 +59,12 @@ class Questions::SorterTest < ActiveSupport::TestCase
       @survey.questions.create!(question_attrs)
     end
 
-    @questions = @survey.questions
+    Questions::RoleQuestionCreator.new(survey: @survey).perform
+    @questions = @survey.questions.reload
   end
 
   test "perform returns nil if questions are nil" do
-    sorter = Questions::Sorter.new(questions: nil, target_role_name: "Frontend Engineer")
+    sorter = Questions::Sorter.new(questions: nil, target_role_name: @fe_role.name)
     assert_nil sorter.perform
   end
 
@@ -76,23 +77,23 @@ class Questions::SorterTest < ActiveSupport::TestCase
   end
 
   test "perform returns questions for target role and nil role_id, ordered by position" do
-    sorter = Questions::Sorter.new(questions: @questions, target_role_name: "Frontend Engineer")
+    sorter = Questions::Sorter.new(questions: @questions, target_role_name: @fe_role.name)
     result = sorter.perform
     expected_question_ids = @questions.where(role_id: [@fe_role.id, nil]).order(:position).pluck(:id)
     assert_equal expected_question_ids, result.pluck(:id)
-    assert_equal [2, 4], result.pluck(:position)
+    assert_equal [1, 3, 5], result.pluck(:position)
   end
 
   test "perform returns questions for another role and nil role_id, ordered by position" do
-    sorter = Questions::Sorter.new(questions: @questions, target_role_name: "Product Manager")
+    sorter = Questions::Sorter.new(questions: @questions, target_role_name: @pm_role.name)
     result = sorter.perform
     expected_question_ids = @questions.where(role_id: [@pm_role.id, nil]).order(:position).pluck(:id)
     assert_equal expected_question_ids, result.pluck(:id)
-    assert_equal [1, 4, 5], result.pluck(:position)
+    assert_equal [1, 2, 5, 6], result.pluck(:position)
   end
 
   test "grouped_hidden_questions_by_role_name returns a Hash of questions for roles other than the target role, grouped by role name and ordered by position" do
-    sorter = Questions::Sorter.new(questions: @questions, target_role_name: "Frontend Engineer")
+    sorter = Questions::Sorter.new(questions: @questions, target_role_name: @fe_role.name)
     result = sorter.grouped_hidden_questions_by_role_name
 
     hidden_roles = [@be_role, @pm_role]
@@ -112,7 +113,7 @@ class Questions::SorterTest < ActiveSupport::TestCase
     end
 
     all_result_questions = result.values.flatten.sort_by(&:position)
-    assert_equal [1, 3, 5], all_result_questions.pluck(:position)
+    assert_equal [2, 4, 6], all_result_questions.pluck(:position)
   end
 
   test "grouped_hidden_questions_by_role_name returns empty result when no questions exist for other roles" do
@@ -132,7 +133,7 @@ class Questions::SorterTest < ActiveSupport::TestCase
       role_id: nil
     )
 
-    sorter = Questions::Sorter.new(questions: survey.questions, target_role_name: "Frontend Engineer")
+    sorter = Questions::Sorter.new(questions: survey.questions, target_role_name: @fe_role.name)
     result = sorter.grouped_hidden_questions_by_role_name
     assert_empty result
   end
@@ -143,5 +144,13 @@ class Questions::SorterTest < ActiveSupport::TestCase
     expected_positions = @questions.order(:position).pluck(:position)
     assert_equal expected_positions, result.pluck(:position)
     assert_equal @questions.count, result.count
+  end
+
+  test "perform shows all targeted and nil questions except default role question" do
+    sorter = Questions::Sorter.new(questions: @questions, target_role_name: @pm_role.name, hide_first_question: true)
+    result = sorter.perform
+    expected_question_ids = @questions.where(role_id: [@pm_role.id, nil]).where.not(position: 1).order(:position).pluck(:id)
+    assert_equal expected_question_ids, result.pluck(:id)
+    assert_equal [2, 5, 6], result.pluck(:position)
   end
 end
