@@ -1,5 +1,6 @@
 class SurveysController < ApplicationController
   before_action :set_survey, only: [:show, :edit, :update, :destroy, :take, :submit]
+  before_action :create_role_default_question, only: [:submit, :take]
 
   def index
     @surveys = Survey.all
@@ -60,6 +61,12 @@ class SurveysController < ApplicationController
   end
 
   private
+
+  def create_role_default_question
+    Questions::RoleQuestionCreator.new(
+      survey: @survey
+    ).perform
+  end
 
   def set_survey
     @survey = Survey.find(params[:id])
