@@ -33,7 +33,9 @@ gem "acts_as_list"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
-gem 'concurrent-ruby', '1.3.4'
+gem "concurrent-ruby", "1.3.4"
+
+gem "memo_wise"
 
 # Use Redis adapter to run Action Cable in production
 # gem "redis", "~> 4.0"

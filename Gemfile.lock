@@ -120,6 +120,7 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.2)
+    memo_wise (1.11.0)
     method_source (1.1.0)
     mini_mime (1.1.5)
     minitest (5.25.5)
@@ -263,6 +264,7 @@ DEPENDENCIES
   foreman (~> 0.88.1)
   jbuilder
   jsbundling-rails
+  memo_wise
   pg (~> 1.1)
   puma (~> 5.0)
   rails (~> 7.0.8)
