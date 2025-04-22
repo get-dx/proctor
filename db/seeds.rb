@@ -11,6 +11,11 @@ puts "Clearing existing data..."
 Response.destroy_all
 Question.destroy_all
 Survey.destroy_all
+Role.destroy_all
+
+fe_role = Role.create!(name: "frontend engineer")
+be_role = Role.create!(name: "backend engineer")
+pm_role = Role.create!(name: "product manager")
 
 # Create engineering team survey
 puts "Creating engineering team survey..."
@@ -238,6 +243,71 @@ customer_questions = [
 
 customer_questions.each do |question_attrs|
   customer_survey.questions.create!(question_attrs)
+end
+
+# Add seed data to verify survey that has default question with it
+puts "Creating role based question survey WITH DEFAULT question..."
+role_survey = Survey.create(
+  title: "Survey with role questions WITH DEFAULT already created",
+  description: "Visiting the take action and even updating"
+)
+rb_questions = [
+  {
+    content: "How do you feel when a designer hands you a 12-column layout for a mobile screen?",
+    question_type: "long_text",
+    position: 1,
+    options: [],
+    required: false,
+    role_id: fe_role.id
+  },
+  {
+    content: "What’s the most cursed error message you’ve ever seen in a log file, and how did it haunt you?",
+    question_type: "long_text",
+    position: 2,
+    options: [],
+    required: false,
+    role_id: be_role.id
+  },
+  {
+    content: "If we did a team dinner, what type of restaurant would you want to dine at?",
+    question_type: "multiple_choice",
+    position: 3,
+    options: ["Mexican", "Indian", "Chinese", "Something else"],
+    required: false,
+    role_id: fe_role.id
+  },
+  {
+    content: "What’s your go-to move when a sprint is behind but the client wants a demo tomorrow?",
+    question_type: "text",
+    position: 4,
+    options: [],
+    required: false,
+    role_id: pm_role.id
+  },
+  {
+    content: "What’s the most ridiculous feature request you’ve ever gotten from a stakeholder, and how did you handle it?",
+    question_type: "long_text",
+    position: 3,
+    options: [],
+    required: false,
+    role_id: pm_role.id
+  }
+]
+
+rb_questions.each do |question_attrs|
+  role_survey.questions.create!(question_attrs)
+end
+
+Questions::RoleQuestionCreator.new(survey: role_survey).perform
+
+# Add seed data to verify survey that does not have a default question with it
+puts "Creating role based question survey with WITHOUT DEFAULT question..."
+role_survey_2 = Survey.create(
+  title: "Survey with role questions WITHOUT DEFAULT already created",
+  description: "Visiting the take action and even updating"
+)
+rb_questions.each do |question_attrs|
+  role_survey_2.questions.create!(question_attrs)
 end
 
 puts "Seed data created successfully!"
