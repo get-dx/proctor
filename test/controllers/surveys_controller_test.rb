@@ -57,10 +57,8 @@ class SurveysControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get take_v2" do
-    get take_v2_survey_url(@survey), params: {question_response_content: questions(:one).content}, as: :json
+    get take_v2_survey_url(@survey), params: {question_response_content: questions(:one).content}
     assert_response :success
-    json_response = JSON.parse(response.body)
-    assert_not_nil json_response["data"]
   end
 
   test "should submit survey responses" do

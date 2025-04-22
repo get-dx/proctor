@@ -45,7 +45,6 @@ class SurveysController < ApplicationController
       target_role_name: params[:question_response_content],
       hide_first_question: true
     ).perform
-    render json: {data: @questions}
   end
 
   def take
