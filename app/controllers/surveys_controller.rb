@@ -1,6 +1,6 @@
 class SurveysController < ApplicationController
   before_action :set_survey, only: [:show, :edit, :update, :destroy, :take, :take_v2, :submit]
-  before_action :create_role_default_question, only: [:submit, :take]
+  before_action :create_role_default_question, only: [:show, :take]
 
   def index
     @surveys = Survey.all
