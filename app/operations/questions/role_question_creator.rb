@@ -1,5 +1,7 @@
 module Questions
   class RoleQuestionCreator
+    prepend MemoWise
+
     attr_reader :survey
 
     def initialize(survey:)
@@ -27,15 +29,18 @@ module Questions
     def no_role_questions?
       questions.all? { |question| question.role_id.nil? }
     end
+    memo_wise :no_role_questions?
 
     def questions
       survey.questions
     end
+    memo_wise :questions
 
     def default_role_question_present?
       Questions::DefaultRoleQuestionDetector.new(
         questions: questions
       ).perform
     end
+    memo_wise :default_role_question_present?
   end
 end
