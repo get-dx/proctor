@@ -1,5 +1,7 @@
 module Questions
   class Sorter
+    prepend MemoWise
+
     attr_reader :target_role_name
 
     def initialize(questions:, target_role_name: nil, hide_first_question: false)
@@ -35,6 +37,7 @@ module Questions
 
       questions.where(role_id: other_role_ids)
     end
+    memo_wise :hidden_questions
 
     def target_role_order
       if hide_first_question
@@ -43,16 +46,19 @@ module Questions
         role_specific_and_general_questions.order(:position)
       end
     end
+    memo_wise :target_role_order
 
     # any question that doesn't have a role is treated as a question
     # that all roles should answer
     def role_specific_and_general_questions
       questions.where(role_id: [question_role_context.target.id, nil])
     end
+    memo_wise :role_specific_and_general_questions
 
     def default_order
       questions.order(:position)
     end
+    memo_wise :default_order
 
     def question_role_context
       Questions::RoleFilter.new(
@@ -60,5 +66,6 @@ module Questions
         target_role_name: target_role_name
       )
     end
+    memo_wise :question_role_context
   end
 end
