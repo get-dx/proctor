@@ -153,4 +153,13 @@ class Questions::SorterTest < ActiveSupport::TestCase
     assert_equal expected_question_ids, result.pluck(:id)
     assert_equal [2, 5, 6], result.pluck(:position)
   end
+
+  test "perform returns only the first question when show_first_question is true" do
+    sorter = Questions::Sorter.new(questions: @questions, target_role_name: @pm_role.name, show_first_question: true)
+    result = sorter.perform
+    expected_question = @questions.order(:position).first
+    assert_equal [expected_question.id], result.pluck(:id)
+    assert_equal [1], result.pluck(:position)
+    assert_equal 1, result.count
+  end
 end

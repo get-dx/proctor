@@ -51,7 +51,8 @@ class SurveysController < ApplicationController
   def take
     @questions = Questions::Sorter.new(
       questions: @survey.questions,
-      target_role_name: nil
+      target_role_name: nil,
+      show_first_question: default_role_question_present?
     ).perform
   end
 
@@ -70,6 +71,10 @@ class SurveysController < ApplicationController
   end
 
   private
+
+  def default_role_question_present?
+    Questions::DefaultRoleQuestionDetector.new(questions: @survey.questions).perform
+  end
 
   def create_role_default_question
     Questions::RoleQuestionCreator.new(

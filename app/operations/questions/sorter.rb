@@ -4,14 +4,16 @@ module Questions
 
     attr_reader :target_role_name
 
-    def initialize(questions:, target_role_name: nil, hide_first_question: false)
+    def initialize(questions:, target_role_name: nil, hide_first_question: false, show_first_question: false)
       @questions = questions
       @target_role_name = target_role_name
       @hide_first_question = hide_first_question
+      @show_first_question = show_first_question
     end
 
     def perform
       return if questions.nil?
+      return first_question if show_first_question
       return default_order if target_role_name.nil? || question_role_context.target.nil?
 
       target_role_order
@@ -29,7 +31,11 @@ module Questions
 
     private
 
-    attr_reader :questions, :hide_first_question
+    attr_reader :questions, :hide_first_question, :show_first_question
+
+    def first_question
+      default_order.select {|question| question.position == 1}
+    end
 
     def hidden_questions
       return Question.none if questions.nil?
