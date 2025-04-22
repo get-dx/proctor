@@ -1,5 +1,7 @@
 module Questions
   class RoleFilter
+    prepend MemoWise
+
     attr_reader :questions, :target_role_name
 
     def initialize(questions:, target_role_name:)
@@ -16,24 +18,21 @@ module Questions
     end
 
     def all
-      Role.where(id: role_ids)
+      roles
     end
 
     private
 
-    def other_role_ids
-      target_id = target&.id
-      target_id ? roles.ids - [target_id] : roles.ids
-    end
-
     def roles
       Role.where(id: role_ids)
     end
+    memo_wise :roles
 
     def role_ids
       return [] if questions.nil?
 
       questions.pluck(:role_id).compact.uniq
     end
+    memo_wise :role_ids
   end
 end
