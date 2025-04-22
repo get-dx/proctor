@@ -12,7 +12,7 @@ module Questions
     end
 
     def perform
-      return if questions.nil?
+      return Question.none if questions.nil?
       return first_question if show_first_question
       return default_order if target_role_name.nil? || question_role_context.target.nil?
 
@@ -20,10 +20,10 @@ module Questions
     end
 
     def grouped_hidden_questions_by_role_name
-      ordered_questions = hidden_questions.order(:position)
       role_names = question_role_context.others.pluck(:id, :name).to_h
 
-      ordered_questions
+      hidden_questions
+        .order(:position)
         .group_by(&:role_id)
         .transform_keys { |role_id| role_names[role_id] }
         .transform_values { |qs| qs.sort_by(&:position) }
@@ -34,7 +34,7 @@ module Questions
     attr_reader :questions, :hide_first_question, :show_first_question
 
     def first_question
-      default_order.select {|question| question.position == 1}
+      default_order.where(position: 1)
     end
 
     def hidden_questions

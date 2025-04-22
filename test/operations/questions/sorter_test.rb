@@ -65,7 +65,7 @@ class Questions::SorterTest < ActiveSupport::TestCase
 
   test "perform returns nil if questions are nil" do
     sorter = Questions::Sorter.new(questions: nil, target_role_name: @fe_role.name)
-    assert_nil sorter.perform
+    assert_empty sorter.perform
   end
 
   test "perform returns questions in default order when target_role_name is nil" do
