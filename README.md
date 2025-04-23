@@ -31,3 +31,5 @@ I also discovered at some point that my editor wasn't auto fixing linting issues
 
 # Limitations
 Time and my lack of knowledge of the frontend. I was able to make some small changes around `TakeSurvey` but unfortunately nothing like I had set out. I tried quite a few times to try to use `useState` to store the initial value of response and then use that to fetch the data from `take_v2` and then refresh the UI with the targeted questions. But I hit my timebox in trying to get it to work.
+
+Another thing I would have liked to implement, is how questions are currently displayed. A number of survey tools only display one question at a time. I've seen some of these survey tools dynamically change the number of questions after a particular response, which makes me believe they have logic under the hood. Personally, I find it a better user experience.
