@@ -16,6 +16,8 @@ One thing that I wanted to guard against is a user creating a survey with role b
 
 I debated if I wanted to add another column, possibly called `auto_generated` or the like, to the `questions` table. It would give us an attribute to assign when creating a question automatically for the user, but I decided against it as I didn't need it. This came up if a survey had role based questions and somehow the user created the exact same question as the auto generated one.
 
+Another decision I made was whether or not a question could have many roles. I could see a world where this is a desired feature and it'd save the survey creator from having to create the same question again and assigning it a different role. But for the sake of simplicity I didn't implement this. If I did, a join table is probably most appropriate.
+
 I added a few dependencies to the project [shoulda](https://matchers.shoulda.io) (also known as `shoulda-matchers`) as it is great to validate Active Record validations and associations with their spec matchers. I also introduced [memo_wise](https://github.com/panorama-ed/memo_wise) to help with Ruby memoization. I find it a bit more natural to reach for and it also reliably handles nil and false returns and more. I also use it as a communication tool for other developers that the value isn't going to change so we can memoize it. I don't always do it, but it's a pattern I like.
 
 # Learnings
