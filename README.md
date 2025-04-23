@@ -1,131 +1,31 @@
-# Proctor: Basic Survey Application 
+# Approach
+For most problems like this, the first step I take is to write down the requirements and then start to brainstorm some ideas. I find this helps me visualize the data model and potentially start to see the various parts required.
 
-This is a coding challenge created by DX. It houses a basic survey application that will serve as the basis for the challenge.
+I tried to lean into an API first approach and thinking. I thought about clients calling to various endpoints and wanting to get the data back they desired. I wanted this to also go beyond a POC so I tried to accomodate some of the edge cases I could foresee a user running into.
 
-## Challenge Description
-The scenario: We want to be able customize questions in the survey depending on the role of the person responding (i.e. Data Engineer, Frontend Engineer, Product Manager, etc.).
+I left some descriptive commit messages. There's no time like the present to write down why a decision is being made. So if there's a line of code in question I suggest reading the commit message to see if it clears up any confusion.
 
-Here's what we'd like to see:
-* Implement a way to define the different branches of a survey and the questions that are shown or hidden for each branch
-* Update the respondent experience to collect their role and then display the appropriate questions based on the branch
-* (If time allows) Add a way to analyze the response data between the different branches
+Thank you for creating some seed data as well! I continued the pattern and added it directly to the file. 🌱
 
-The boilerplate code provides a very basic survey application with the ability to create surveys, add questions, and collect responses. Your job is to extend this functionality to support branching.
+# Decisions
+I created an `app/operations` directory as I've found this to be a nice place to hold a lot of the business logic layer. A good example of this is when I realized I was missing some business logic regarding when to show the first question in a survey, so I just added `show_first_question` to `Questions::Sorter` class. It was really easy to add that functionality!
 
-Any and all existing code or seed data can be edited in any way. Anything that's here is purely to serve as a functional starting point to begin building off of.
+I decided to treat questions with a role_id of `nil` as questions meant for everyone. It felt more natural to do that than have a default `role` assigned to them.
 
-## Evaluation Criteria
-The purpose of this exercise is to evaluate how you would implement a moderately complex feature, consider tradeoffs, and explain your thinking on a real project. We are not evaluating your ability to implement algorithms from scratch — feel free to use tools or libraries that you would reach for in your actual day to day work.
+One thing that I wanted to guard against is a user creating a survey with role based questions and the user deleting the question. That's why I created`Questions::RoleQuestionCreator`to help create the default question and `Questions::DefaultRoleQuestionDetector` to tell me if a question needed to be created or not. I currently have this sitting in the controller, but a future refactor could be done to move this within the operation itself.
 
-## Technology Stack
+I debated if I wanted to add another column, possibly called `auto_generated` or the like, to the `questions` table. It would give us an attribute to assign when creating a question automatically for the user, but I decided against it as I didn't need it. This came up if a survey had role based questions and somehow the user created the exact same question as the auto generated one.
 
-- **Backend**: Ruby on Rails 7
-- **Frontend**: React with esbuild
-- **Styling**: Tailwind CSS
-- **Database**: PostgreSQL
+I added a few dependencies to the project [shoulda](https://matchers.shoulda.io) (also known as `shoulda-matchers`) as it is great to validate Active Record validations and associations with their spec matchers. I also introduced [memo_wise](https://github.com/panorama-ed/memo_wise) to help with Ruby memoization. I find it a bit more natural to reach for and it also reliably handles nil and false returns and more. I also use it as a communication tool for other developers that the value isn't going to change so we can memoize it. I don't always do it, but it's a pattern I like.
 
-## Getting Started
+# Learnings
+I learned that not all parts of the application were working. I decided one of the first things I wanted to do was get `rails test` to be green. I like the ability to refactor later and just lean into the test suite.
 
-### Prerequisites
+I haven't worked with minitest much, so it was a bit of a learning curve. My first inclination was to reach for RSpec, as it's what I'm most familiar with. But I saw a handful of tests already written so I figured I'd just keep the pattern of the project. There may be some anti-patterns in there, so forgive me. 😅
 
-- Ruby 3.1.3 or higher
-- PostgreSQL
-- Node.js (for JavaScript and CSS processing)
+If I had more time I'd probably refactor `Questions::Sorter` as it seems like there's opportunity to refine it and possibly split out another class to handle the logic around when to display and omit the first question.
 
-### Setup Instructions (macOS)
+I also discovered at some point that my editor wasn't auto fixing linting issues and that I was using both single quotes and double at times. So I decided to run the `standard` command against the project to unify the styles to not detract from viewing the code.
 
-#### Install Dependencies with Homebrew
-
-1. Install Homebrew (if not already installed)
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
-
-2. Install Ruby via rbenv
-   ```bash
-   brew install rbenv ruby-build
-   echo 'eval "$(rbenv init -)"' >> ~/.zshrc  # or ~/.bash_profile for bash users
-   source ~/.zshrc  # or source ~/.bash_profile for bash users
-   rbenv install 3.1.3
-   rbenv global 3.1.3
-   ruby -v  # Verify installation
-   ```
-
-3. Install PostgreSQL
-   ```bash
-   brew install postgresql@15
-   brew services start postgresql@15
-   ```
-
-4. Install Node.js
-   ```bash
-   # Install nvm (Node Version Manager) for better Node.js version management
-   brew install nvm
-   
-   # Create NVM's working directory if it doesn't exist
-   mkdir -p ~/.nvm
-   
-   # Add NVM to your shell profile
-   echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.zshrc
-   echo '[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"' >> ~/.zshrc
-   echo '[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"' >> ~/.zshrc
-   
-   # Source the updated profile
-   source ~/.zshrc
-   
-   # Install and use Node.js version 20 (compatible with the project dependencies)
-   nvm install 20
-   nvm use 20
-   
-   # Verify installation
-   node -v
-   ```
-
-#### Project Setup
-
-1. Clone this repository
-   ```bash
-   git clone <repository-url>
-   cd proctor
-   ```
-
-2. Install Ruby dependencies
-   ```bash
-   gem install bundler
-   bundle install
-   ```
-
-3. Install JavaScript dependencies
-   ```bash
-   npm install
-   ```
-
-4. Setup the database
-   ```bash
-   bin/rails db:create
-   bin/rails db:migrate
-   bin/rails db:seed
-   ```
-
-5. Start the Rails server and build the frontend assets
-   ```bash
-   bin/dev
-   ```
-
-6. Visit `http://localhost:3000` in your browser
-
-## React Components
-
-The application uses React for the frontend. The main components are:
-
-- **SurveyForm**: For creating and editing surveys
-- **QuestionList**: For displaying and managing questions
-- **TakeSurvey**: For taking surveys and submitting responses
-
-These components are located in the `app/javascript/components` directory.
-
-## Submission
-
-Please submit your solution as a .zip file or Github repo with clear instructions on how to run your code. Include any notes or explanations in the README or as comments in your code.
-
-Good luck!
+# Limitations
+Time and my lack of knowledge of the frontend. I was able to make some small changes around `TakeSurvey` but unfortunately nothing like I had set out. I tried quite a few times to try to use `useState` to store the initial value of response and then use that to fetch the data from `take_v2` and then refresh the UI with the targeted questions. But I hit my timebox in trying to get it to work.
