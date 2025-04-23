@@ -2,12 +2,12 @@
 
 one:
   survey: one
-  content: MyText
-  question_type: MyString
+  content: "What best describes your current role?"
   position: 1
+  required: true
 
 two:
   survey: two
   content: MyText
-  question_type: MyString
+  question_type: text
   position: 1

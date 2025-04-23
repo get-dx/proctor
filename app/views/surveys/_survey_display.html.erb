@@ -14,6 +14,8 @@
     <!-- Fallback for when JavaScript is disabled -->
     <noscript>
       <%= form_with(url: submit_survey_path(@survey), method: :post, class: "space-y-6") do |form| %>
+        <!-- this is needed in the form because it's used to pass the role information -->
+        <%= hidden_field_tag :role_name, @role_name %>
         <% if @questions.any? %>
           <% @questions.each do |question| %>
             <div class="bg-gray-50 p-4 rounded-md mb-4">

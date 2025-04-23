@@ -18,8 +18,8 @@
     </div>
 
     <!-- React Question List Component -->
-    <div id="question-list-container" 
-         data-survey-id="<%= @survey.id %>" 
+    <div id="question-list-container"
+         data-survey-id="<%= @survey.id %>"
          data-questions="<%= @survey.questions.order(:position).to_json %>"
          data-autoload="false">
     </div>
@@ -36,7 +36,7 @@
                     <%= question.content %>
                   </p>
                   <p class="text-sm text-gray-500">
-                    Type: <%= question.question_type.humanize %>
+                    Type: <%= question&.question_type&.humanize %>
                   </p>
                 </div>
                 <div class="flex space-x-2">

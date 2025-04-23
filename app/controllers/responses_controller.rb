@@ -29,6 +29,7 @@ class ResponsesController < ApplicationController
   def response_params
     params.require(:response).permit(
       :survey_id,
+      :role_name,
       question_responses_attributes: [:question_id, :content]
     )
   end
@@ -37,11 +38,14 @@ class ResponsesController < ApplicationController
     responses_saved = []
     errors = []
 
+    role = Role.find_by!(name: response_params[:role_name].downcase) if response_params[:role_name].present?
+
     question_responses.each do |question_response|
       response = Response.new(
         survey: @survey,
         question_id: question_response[:question_id],
-        value: question_response[:content]
+        value: question_response[:content],
+        role: role
       )
 
       if response.save

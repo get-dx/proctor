@@ -18,7 +18,14 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get update" do
-    patch survey_question_url(survey_id: surveys(:one).id, id: questions(:one).id), params: {question: {content: "Updated question"}}
+    question = questions(:one)
+    patch survey_question_url(survey_id: surveys(:one).id, id: questions(:one).id),
+      params: {
+        question: {
+          content: "foo",
+          question_type: "long_text",
+        }
+      }
     assert_response :redirect
     assert_redirected_to survey_url(surveys(:one))
   end

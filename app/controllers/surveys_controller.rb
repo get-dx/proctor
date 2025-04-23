@@ -1,6 +1,8 @@
 class SurveysController < ApplicationController
   before_action :set_survey, only: [:show, :edit, :update, :destroy, :take, :take_v2, :submit]
   before_action :create_role_default_question, only: [:show, :take]
+  before_action :set_role, only: [:submit, :take_v2]
+
 
   def index
     @surveys = Survey.all
@@ -40,9 +42,11 @@ class SurveysController < ApplicationController
   end
 
   def take_v2
+    @role_name = params[:question_response_content]&.downcase
+
     @questions = Questions::Sorter.new(
       questions: @survey.questions,
-      target_role_name: params[:question_response_content],
+      target_role_name: @role_name,
       hide_first_question: true
     ).perform
   end
@@ -57,10 +61,12 @@ class SurveysController < ApplicationController
 
   def submit
     if params[:responses].present?
+
       params[:responses].each do |response_params|
         @survey.responses.create(
           question_id: response_params[:question_id],
-          value: response_params[:value]
+          value: response_params[:value],
+          role: set_role
         )
       end
       redirect_to surveys_path, notice: "Thank you for completing the survey!"
@@ -70,6 +76,11 @@ class SurveysController < ApplicationController
   end
 
   private
+
+  def set_role
+    Role.find_by(name: params[:role_name]&.downcase) if params[:role_name].present?
+  end
+
 
   def default_role_question_present?
     Questions::DefaultRoleQuestionDetector.new(questions: @survey.questions).perform

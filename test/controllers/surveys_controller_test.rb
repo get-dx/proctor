@@ -57,7 +57,8 @@ class SurveysControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get take_v2" do
-    get take_v2_survey_url(@survey), params: {question_response_content: questions(:one).content}
+    role = roles(:product_manager)
+    get take_v2_survey_url(@survey), params: { question_response_content: role.name }
     assert_response :success
   end
 

@@ -4,8 +4,8 @@ import { createRoot } from 'react-dom/client';
 const TextQuestion = ({ question, onChange }) => {
   return (
     <div className="mt-1">
-      <textarea 
-        rows={3} 
+      <textarea
+        rows={3}
         className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
         onChange={(e) => onChange(question.id, e.target.value)}
       />
@@ -15,7 +15,7 @@ const TextQuestion = ({ question, onChange }) => {
 
 const MultipleChoiceQuestion = ({ question, onChange }) => {
   const options = ['Option 1', 'Option 2', 'Option 3'];
-  
+
   return (
     <div className="mt-2 space-y-2">
       {options.map((option, index) => (
@@ -39,20 +39,20 @@ const MultipleChoiceQuestion = ({ question, onChange }) => {
 const CheckboxQuestion = ({ question, onChange }) => {
   const options = ['Option 1', 'Option 2', 'Option 3'];
   const [selectedOptions, setSelectedOptions] = useState([]);
-  
+
   const handleCheckboxChange = (option, isChecked) => {
     let newSelectedOptions;
-    
+
     if (isChecked) {
       newSelectedOptions = [...selectedOptions, option];
     } else {
       newSelectedOptions = selectedOptions.filter(item => item !== option);
     }
-    
+
     setSelectedOptions(newSelectedOptions);
     onChange(question.id, newSelectedOptions.join(', '));
   };
-  
+
   return (
     <div className="mt-2 space-y-2">
       {options.map((option, index) => (
@@ -117,12 +117,17 @@ const TakeSurvey = (props) => {
     // Validate responses
     const requiredQuestions = questions.filter(q => q.required);
     const missingResponses = requiredQuestions.filter(q => !responses[q.id]);
-    
+
     if (missingResponses.length > 0) {
       setErrors(['Please answer all required questions.']);
       setSubmitting(false);
       return;
     }
+
+    // Get role name from URL if present
+    const pathParts = window.location.pathname.split('/');
+    const roleNameIndex = pathParts.indexOf('take_v2') + 1;
+    const roleName = roleNameIndex < pathParts.length ? decodeURIComponent(pathParts[roleNameIndex]) : null;
 
     // Format response data
     const formattedResponses = Object.keys(responses).map(questionId => ({
@@ -131,7 +136,7 @@ const TakeSurvey = (props) => {
     }));
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    
+
     try {
       const response = await fetch(`/surveys/${survey.id}/responses`, {
         method: 'POST',
@@ -142,6 +147,7 @@ const TakeSurvey = (props) => {
         body: JSON.stringify({
           response: {
             survey_id: survey.id,
+            role_name: roleName,
             question_responses_attributes: formattedResponses
           }
         })
@@ -180,7 +186,7 @@ const TakeSurvey = (props) => {
             />
           </div>
         );
-      
+
       case 'long_text':
         return (
           <div className="mb-4">
@@ -197,7 +203,7 @@ const TakeSurvey = (props) => {
             />
           </div>
         );
-      
+
       case 'multiple_choice':
         const options = question.options || [];
         return (
@@ -228,7 +234,7 @@ const TakeSurvey = (props) => {
             </fieldset>
           </div>
         );
-      
+
       case 'checkbox':
         const checkboxOptions = question.options || [];
         return (
@@ -240,12 +246,12 @@ const TakeSurvey = (props) => {
               <div className="mt-2 space-y-2">
                 {checkboxOptions.map((option, index) => {
                   // Initialize as array if not already
-                  const currentResponses = Array.isArray(responses[question.id]) 
-                    ? responses[question.id] 
+                  const currentResponses = Array.isArray(responses[question.id])
+                    ? responses[question.id]
                     : responses[question.id] ? [responses[question.id]] : [];
-                  
+
                   const isChecked = currentResponses.includes(option);
-                  
+
                   return (
                     <div key={index} className="flex items-center">
                       <input
@@ -274,7 +280,7 @@ const TakeSurvey = (props) => {
             </fieldset>
           </div>
         );
-      
+
       case 'rating':
         return (
           <div className="mb-4">
@@ -310,7 +316,7 @@ const TakeSurvey = (props) => {
             </fieldset>
           </div>
         );
-      
+
       default:
         return (
           <div className="mb-4">
@@ -343,7 +349,7 @@ const TakeSurvey = (props) => {
     <div>
       <h1 className="text-2xl font-bold mb-4">{survey.title}</h1>
       <p className="mb-6">{survey.description}</p>
-      
+
       {errors.length > 0 && (
         <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
           <div className="flex">
@@ -362,14 +368,14 @@ const TakeSurvey = (props) => {
           </div>
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit}>
         {questions.map(question => (
           <div key={question.id} className="mb-6 p-4 bg-white shadow rounded">
             {renderQuestion(question)}
           </div>
         ))}
-        
+
         <div className="mt-6">
           <button
             type="submit"
@@ -390,14 +396,14 @@ const initializeTakeSurvey = () => {
   if (container && !container.hasAttribute('data-react-initialized')) {
     const surveyData = JSON.parse(container.dataset.survey || '{}');
     const questionsData = JSON.parse(container.dataset.questions || '[]');
-    
+
     // Mark as initialized to prevent double initialization
     container.setAttribute('data-react-initialized', 'true');
-    
+
     const root = createRoot(container);
     root.render(
-      <TakeSurvey 
-        survey={surveyData} 
+      <TakeSurvey
+        survey={surveyData}
         questions={questionsData}
       />
     );
@@ -413,4 +419,4 @@ document.addEventListener('DOMContentLoaded', initializeTakeSurvey);
 // Additionally listen for turbo:load event if using Turbo
 document.addEventListener('turbo:load', initializeTakeSurvey);
 
-export default TakeSurvey; 
+export default TakeSurvey;
