@@ -6,6 +6,8 @@ class SurveysControllerTest < ActionDispatch::IntegrationTest
     @survey = surveys(:one)
     @role = roles(:one)
     @branch = survey_branches(:one)
+    @question = questions(:one)
+    @branch_questions = branch_questions(:one)
   end
 
   test "should get index" do
@@ -31,7 +33,7 @@ class SurveysControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get take survey for role" do
-    get take_survey_url(@survey, role: @role.name)
+    get take_survey_url(@survey, role: @role.name.upcase)
     assert_response :success
     assert_select 'form' # Should render questions for the branch
   end

@@ -2,15 +2,18 @@ class QuestionsController < ApplicationController
   before_action :set_survey
   before_action :set_question, only: [:edit, :update, :destroy]
 
+
   def new
-    @question = @survey.questions.new
+    @question = Question.new
   end
 
   def create
-    @question = @survey.questions.new(question_params)
+    @question = Question.new(question_params)
     process_options
 
     if @question.save
+      branch = @survey.survey_branches.first # We may want a way to select branch by param/role
+      BranchQuestion.create!(survey_branch: branch, question: @question)
       redirect_to survey_path(@survey), notice: 'Question was successfully created.'
     else
       render :new, status: :unprocessable_entity
@@ -45,7 +48,7 @@ class QuestionsController < ApplicationController
   end
   
   def set_question
-    @question = @survey.questions.find(params[:id])
+    @question = Question.find(params[:id])
   end
   
   def question_params
