@@ -8,9 +8,16 @@
 
 # Clear existing data
 puts "Clearing existing data..."
-Response.destroy_all
-Question.destroy_all
+Role.destroy_all
 Survey.destroy_all
+SurveyBranch.destroy_all
+Question.destroy_all
+BranchQuestion.destroy_all
+
+# Create roles
+roles = ["Data Engineer", "Frontend Engineer", "QA Engineer", "UX Designer", "Backend Engineer", "Product Manager"].map do |role_name|
+  Role.create!(name: role_name.upcase)
+end
 
 # Create engineering team survey
 puts "Creating engineering team survey..."
@@ -19,9 +26,14 @@ engineering_survey = Survey.create!(
   description: "This survey helps us understand the satisfaction and needs of our engineering team members."
 )
 
+# Create branches for each role
+engineering_survey_branches = roles.map do |role|
+  SurveyBranch.create!(survey: engineering_survey, role: role, name: "#{role.name} Branch")
+end
+
 # Create questions for the engineering survey
 puts "Creating questions for engineering survey..."
-questions = [
+engineering_survey_questions = [
   {
     content: "How satisfied are you with the current development process?",
     question_type: "rating",
@@ -86,10 +98,12 @@ questions = [
     required: false,
     options: ["Jira", "Trello", "Asana", "GitHub Projects", "ClickUp", "Monday.com", "Notion", "Linear", "Other"]
   }
-]
+].map { |attrs| Question.create!(attrs) }
 
-questions.each do |question_attrs|
-  engineering_survey.questions.create!(question_attrs)
+engineering_survey_branches.each do |branch|
+  engineering_survey_questions.each do |question|
+    BranchQuestion.create!(survey_branch: branch, question: question)
+  end
 end
 
 # Create project retrospective survey
@@ -98,6 +112,11 @@ retrospective_survey = Survey.create!(
   title: "Project Retrospective",
   description: "Help us understand what went well and what could be improved in our recent project."
 )
+
+# Create branches for each role
+project_retrospective_survey_branches = roles.map do |role|
+  SurveyBranch.create!(survey: retrospective_survey, role: role, name: "#{role.name} Branch")
+end
 
 # Create questions for the retrospective survey
 puts "Creating questions for retrospective survey..."
@@ -166,10 +185,12 @@ retro_questions = [
     required: false,
     options: ["Technical skills", "Communication", "Problem-solving", "Time management", "Leadership", "Collaboration", "Adaptability", "Domain knowledge"]
   }
-]
+].map { |attrs| Question.create!(attrs) }
 
-retro_questions.each do |question_attrs|
-  retrospective_survey.questions.create!(question_attrs)
+project_retrospective_survey_branches.each do |branch|
+  retro_questions.each do |question|
+    BranchQuestion.create!(survey_branch: branch, question: question)
+  end
 end
 
 # Create customer feedback survey
@@ -178,6 +199,11 @@ customer_survey = Survey.create!(
   title: "Customer Satisfaction Survey",
   description: "We value your feedback! Please help us improve our products and services."
 )
+
+# Create branches for each role
+customer_survey_branches = roles.map do |role|
+  SurveyBranch.create!(survey: customer_survey, role: role, name: "#{role.name} Branch")
+end
 
 # Create questions for the customer survey
 puts "Creating questions for customer survey..."
@@ -234,10 +260,12 @@ customer_questions = [
     required: false,
     options: ["Competitor A", "Competitor B", "Competitor C", "Competitor D", "None", "Other"]
   }
-]
+].map { |attrs| Question.create!(attrs) }
 
-customer_questions.each do |question_attrs|
-  customer_survey.questions.create!(question_attrs)
+customer_survey_branches.each do |branch|
+  customer_questions.each do |question|
+    BranchQuestion.create!(survey_branch: branch, question: question)
+  end
 end
 
 puts "Seed data created successfully!"

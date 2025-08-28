@@ -39,7 +39,10 @@ class SurveysController < ApplicationController
   end
   
   def take
-    @questions = @survey.questions.order(:position)
+    @survey = Survey.find(params[:id])
+    @role = Role.find_by(name: params[:role])
+    @branch = @survey.survey_branches.find_by(role: @role)
+    @questions = @branch.questions.order(:position)
   end
   
   def submit
