@@ -5,6 +5,7 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @survey = surveys(:one)
     @question = questions(:one)
+    @role = roles(:one)
   end
 
   test "should get new" do
@@ -14,7 +15,7 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create question" do
     assert_difference('Question.count') do
-      post survey_questions_url(@survey), params: { question: { content: 'Test?', question_type: 'text' } }
+      post survey_questions_url(@survey), params: { question: { content: 'Test?', question_type: 'text' }, role: @role.name }
     end
     assert_redirected_to survey_path(@survey)
   end

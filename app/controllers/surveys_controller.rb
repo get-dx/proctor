@@ -3,6 +3,7 @@ class SurveysController < ApplicationController
 
   def index
     @surveys = Survey.all
+    @roles = Role.all
   end
 
   def show

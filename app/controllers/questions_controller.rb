@@ -1,7 +1,7 @@
 class QuestionsController < ApplicationController
   before_action :set_survey
   before_action :set_question, only: [:edit, :update, :destroy]
-
+  before_action :set_role, only: [:new, :create, :edit, :update, :destroy]
 
   def new
     @question = Question.new
@@ -12,7 +12,7 @@ class QuestionsController < ApplicationController
     process_options
 
     if @question.save
-      branch = @survey.survey_branches.first # We may want a way to select branch by param/role
+      branch = @survey.survey_branches.find_by(survey_id: @survey.id, role_id: @role.id)
       BranchQuestion.create!(survey_branch: branch, question: @question)
       redirect_to survey_path(@survey), notice: 'Question was successfully created.'
     else
@@ -49,6 +49,10 @@ class QuestionsController < ApplicationController
   
   def set_question
     @question = Question.find(params[:id])
+  end
+
+  def set_role
+    @role = Role.find_by(name: params[:role].upcase) if params[:role].present?
   end
   
   def question_params
