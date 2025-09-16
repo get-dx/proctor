@@ -96,7 +96,7 @@ const RatingQuestion = ({ question, onChange }) => {
 };
 
 const TakeSurvey = (props) => {
-  const { survey, questions } = props;
+  const { survey, role, questions } = props;
   const [responses, setResponses] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -133,7 +133,7 @@ const TakeSurvey = (props) => {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     
     try {
-      const response = await fetch(`/surveys/${survey.id}/responses`, {
+      const response = await fetch(`/surveys/${survey.id}/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +142,8 @@ const TakeSurvey = (props) => {
         body: JSON.stringify({
           response: {
             survey_id: survey.id,
-            question_responses_attributes: formattedResponses
+            role: role,
+            responses: formattedResponses
           }
         })
       });
@@ -387,6 +388,7 @@ const TakeSurvey = (props) => {
 // Use a self-executing function to initialize the component
 const initializeTakeSurvey = () => {
   const container = document.getElementById('take-survey-container');
+  const role = container?.dataset.role;
   if (container && !container.hasAttribute('data-react-initialized')) {
     const surveyData = JSON.parse(container.dataset.survey || '{}');
     const questionsData = JSON.parse(container.dataset.questions || '[]');
@@ -399,6 +401,7 @@ const initializeTakeSurvey = () => {
       <TakeSurvey 
         survey={surveyData} 
         questions={questionsData}
+        role={role}
       />
     );
   }

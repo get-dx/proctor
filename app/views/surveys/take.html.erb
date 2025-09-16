@@ -8,12 +8,14 @@
     <!-- React Take Survey Component -->
     <div id="take-survey-container" 
          data-survey="<%= @survey.to_json %>" 
-         data-questions="<%= @questions.to_json %>">
+         data-questions="<%= @questions.to_json %>"
+         data-role="<%= params[:role] %>">
     </div>
     
     <!-- Fallback for when JavaScript is disabled -->
     <noscript>
       <%= form_with(url: submit_survey_path(@survey), method: :post, class: "space-y-6") do |form| %>
+        <%= hidden_field_tag :role, params[:role] %>
         <% if @questions.any? %>
           <% @questions.each do |question| %>
             <div class="bg-gray-50 p-4 rounded-md mb-4">

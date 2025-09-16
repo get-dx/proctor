@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client';
 const RoleModal = ({ open, roles, value, onSelect, onClose }) => {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded shadow-lg min-w-[300px]">
         <h2 className="text-lg font-bold mb-4">Choose Your Role</h2>
         <RoleSelect roles={roles} value={value} onChange={onSelect} />
@@ -23,6 +23,7 @@ const RoleModal = ({ open, roles, value, onSelect, onClose }) => {
 // Use a self-executing function to initialize the component
 const initializeRoleModal = () => {
   const container = document.getElementById('role-modal-root');
+  if (!container) return; // Prevents error if element is missing
   const roles = JSON.parse(container.dataset.roles);
   if (container && !container.hasAttribute('data-react-initialized')) {
     
@@ -30,21 +31,31 @@ const initializeRoleModal = () => {
     container.setAttribute('data-react-initialized', 'true');
     
     const root = createRoot(container);
+
+    let modalOpen = false;
+
     document.querySelectorAll(".take-survey-link").forEach(link => {
         link.addEventListener("click", function(e) {
-        e.preventDefault();
-        const surveyId = this.dataset.surveyId;
-        // Render your React RoleModal, passing surveyId as a prop
-        root.render(
-            <RoleModal
-            open={true}
-            roles={roles} // Provide actual roles array
-            value={null} // Provide actual value if needed
-            onSelect={() => {}} // Provide actual handler
-            onClose={() => {}} // Provide actual handler
-            />,
-            document.getElementById("role-modal-root")
-        )
+          e.preventDefault();
+          const surveyId = this.dataset.surveyId;
+          // Render your React RoleModal, passing surveyId as a prop
+          root.render(
+              <RoleModal
+              open={true}
+              roles={roles} // Provide actual roles array
+              value={""} // Provide actual value if needed
+              onSelect={async (role) => {
+                // Redirect to /surveys/:id/take?role=selectedRole
+                window.location.href = `/surveys/${surveyId}/take?role=${encodeURIComponent(role)}`;
+                root.render(null); // Close modal after selection}} // Provide actual handler
+              }}
+              onClose={() => {
+                modalOpen = false;
+                root.render(null); // Unmount the modal
+
+              }} 
+              />,
+          );
         });
     });
   }

@@ -41,7 +41,7 @@ class SurveysController < ApplicationController
   
   def take
     @survey = Survey.find(params[:id])
-    @role = Role.find_by(name: params[:role].upcase)
+    @role = Role.find(params[:role])
     @branch = @survey.survey_branches.find_by(role: @role)
     @questions = Question.joins(:branch_questions)
                         .where(branch_questions: { survey_branch_id: @branch.id })
@@ -49,11 +49,12 @@ class SurveysController < ApplicationController
   end
   
   def submit
-    if params[:responses].present?
-      params[:responses].each do |response_params|
+    responses = params[:response][:responses]
+    if responses.present?
+      responses.each do |response_params|
         @survey.responses.create(
           question_id: response_params[:question_id],
-          value: response_params[:value],
+          value: response_params[:content],
         )
       end
       redirect_to surveys_path, notice: 'Thank you for completing the survey!'
