@@ -33,7 +33,7 @@ class SurveysControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get take survey for role" do
-    get take_survey_url(@survey, role: @role.name.upcase)
+    get take_survey_url(@survey, role: @role)
     assert_response :success
     assert_select 'form' # Should render questions for the branch
   end

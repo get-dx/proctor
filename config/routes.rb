@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   # Set the root path to the surveys index
   root "surveys#index"
   
+  resources :roles
+
   # RESTful routes for surveys
   resources :surveys do
     # Nested routes for questions

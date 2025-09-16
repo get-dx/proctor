@@ -1,0 +1,19 @@
+<%= form_with(model: role, local: true, class: "space-y-6") do |form| %>
+  <% if role.errors.any? %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <h2 class="font-bold mb-2"><%= pluralize(role.errors.count, "error") %> prohibited this role from being saved:</h2>
+      <ul class="list-disc pl-5">
+        <% role.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div>
+    <%= form.label :name, class: "block text-gray-700 font-medium mb-2" %>
+    <%= form.text_field :name, class: "mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" %>
+  </div>
+  <div>
+    <%= form.submit class: "px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700" %>
+  </div>
+<% end %>

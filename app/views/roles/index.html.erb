@@ -1,0 +1,17 @@
+<div class="max-w-2xl mx-auto mt-8 bg-white shadow rounded-lg p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Roles</h1>
+    <%= link_to 'New Role', new_role_path, class: "inline-block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700" %>
+  </div>
+  <ul class="divide-y divide-gray-200">
+    <% @roles.each do |role| %>
+      <li class="py-4 flex justify-between items-center">
+        <span class="text-gray-800"><%= link_to role.name, role, class: "hover:underline" %></span>
+        <div class="space-x-2">
+          <%= link_to 'Edit', edit_role_path(role), class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200" %>
+          <%= link_to 'Destroy', role, method: :delete, data: { confirm: 'Are you sure?' }, class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200" %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</div>
