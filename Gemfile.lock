@@ -198,7 +198,7 @@ GEM
     regexp_parser (2.10.0)
     reline (0.6.0)
       io-console (~> 0.5)
-    rexml (3.4.1)
+    rexml (3.4.2)
     rubyzip (2.4.1)
     selenium-webdriver (4.29.1)
       base64 (~> 0.2)
