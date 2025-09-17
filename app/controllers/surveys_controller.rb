@@ -7,6 +7,7 @@ class SurveysController < ApplicationController
   end
 
   def show
+    @roles = Role.all
   end
 
   def new

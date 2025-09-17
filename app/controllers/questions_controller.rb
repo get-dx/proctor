@@ -5,7 +5,7 @@ class QuestionsController < ApplicationController
   before_action :set_roles, only: [:new, :create, :edit, :update]
 
   def index
-    @questions = @survey.questions
+    @questions = @survey.questions.distinct
 
     if params[:survey_branch_id].present?
       @questions = @questions.joins(:branch_questions)

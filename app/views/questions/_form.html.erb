@@ -65,7 +65,14 @@
   </div>
   <div>
     <%= form.label :role_id, "Role", class: "block text-sm font-medium text-gray-700" %>
-    <%= form.collection_select :survey_branch_id, @survey.survey_branches.includes(:role), :id, ->(sb) { sb.role.name }, { prompt: "Select a branch/role" }, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
+    <% if question.new_record? %>
+      <%= form.collection_select :survey_branch_id, @survey.survey_branches.includes(:role), :id, ->(sb) { sb.role.name }, { prompt: "Select a branch/role" }, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
+    <% else %>
+      <% branch = question.survey_branches.find_by(survey_id: @survey.id) %>
+        <div class="mt-1 p-2 bg-gray-100 rounded text-gray-700">
+          <%= branch&.role&.name || "No role assigned" %>
+        </div>
+    <% end %> 
   </div>
   <div class="flex items-start">
     <div class="flex items-center h-5">

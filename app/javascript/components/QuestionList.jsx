@@ -21,9 +21,7 @@ const QuestionList = (props) => {
   };
 
   useEffect(() => {
-    // initial load
     fetchQuestions();
-    // wire up filter if provided
     const selectId = props.filterSelectId;
     if (selectId) {
       const sel = document.getElementById(selectId);
