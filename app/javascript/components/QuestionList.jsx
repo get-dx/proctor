@@ -5,24 +5,35 @@ const QuestionList = (props) => {
   const [questions, setQuestions] = useState(props.questions || []);
   const [loading, setLoading] = useState(false);
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = async (surveyBranchId = "") => {
     setLoading(true);
     try {
-      const response = await fetch(`/surveys/${props.surveyId}/questions.json`);
-      if (response.ok) {
-        const data = await response.json();
-        setQuestions(data);
-      }
-    } catch (error) {
-      console.error('Error fetching questions:', error);
+      const url = `/surveys/${props.surveyId}/questions.json` + (surveyBranchId ? `?survey_branch_id=${encodeURIComponent(surveyBranchId)}` : "");
+      const res = await fetch(url, { headers: { "Accept": "application/json" } });
+      if (!res.ok) throw new Error("Failed to load questions");
+      const data = await res.json();
+      setQuestions(data);
+    } catch (e) {
+      console.error("Error loading questions", e);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (props.autoload && props.surveyId) {
-      fetchQuestions();
+    // initial load
+    fetchQuestions();
+    // wire up filter if provided
+    const selectId = props.filterSelectId;
+    if (selectId) {
+      const sel = document.getElementById(selectId);
+      if (sel) {
+        const handler = (e) => {
+          fetchQuestions(e.target.value || "");
+        };
+        sel.addEventListener("change", handler);
+        return () => sel.removeEventListener("change", handler);
+      }
     }
   }, [props.surveyId]);
 
@@ -102,23 +113,18 @@ const QuestionList = (props) => {
 // Use a self-executing function to initialize the component
 const initializeQuestionList = () => {
   const container = document.getElementById('question-list-container');
-  if (container && !container.hasAttribute('data-react-initialized')) {
-    const surveyId = container.dataset.surveyId;
-    const questionsData = JSON.parse(container.dataset.questions || '[]');
-    const autoload = container.dataset.autoload === 'true';
-    
-    // Mark as initialized to prevent double initialization
-    container.setAttribute('data-react-initialized', 'true');
-    
-    const root = createRoot(container);
-    root.render(
-      <QuestionList 
-        surveyId={surveyId} 
-        questions={questionsData}
-        autoload={autoload}
-      />
-    );
-  }
+  if (!container || container.hasAttribute('data-react-initialized')) return;
+  const surveyId = container.dataset.surveyId;
+  const filterSelectId = container.dataset.filterSelectId;
+  container.setAttribute('data-react-initialized', 'true');
+  const root = createRoot(container);
+  root.render(
+    <QuestionList
+      surveyId={surveyId}
+      filterSelectId={filterSelectId}
+      questions={[]}
+    />
+  );
 };
 
 // Try to initialize immediately

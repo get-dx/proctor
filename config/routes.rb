@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   # RESTful routes for surveys
   resources :surveys do
     # Nested routes for questions
-    resources :questions, except: [:index, :show]
+    resources :questions, except: [:show]
     
     # Route for taking a survey
     member do

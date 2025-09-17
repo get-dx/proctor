@@ -17,11 +17,25 @@
       <%= link_to "Add Question", new_survey_question_path(@survey), class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
     </div>
 
+    <div class="mb-4">
+      <label for="survey-branch-filter" class="block text-sm font-medium text-gray-700">
+        Filter by Role
+      </label>
+      <select id="survey-branch-filter"
+              class="mt-1 block w-64 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+        <option value="">All Roles</option>
+        <% @survey.survey_branches.includes(:role).each do |branch| %>
+          <option value="<%= branch.id %>"><%= branch.role.name %></option>
+        <% end %>
+      </select>
+    </div>
+
     <!-- React Question List Component -->
     <div id="question-list-container" 
          data-survey-id="<%= @survey.id %>" 
-         data-questions="<%= @survey.questions.order(:position).to_json %>"
-         data-autoload="false">
+         data-questions="<%= [].to_json %>"
+         data-autoload="false"
+         data-filter-select-id="survey-branch-filter">
     </div>
 
     <!-- Fallback for when JavaScript is disabled -->
