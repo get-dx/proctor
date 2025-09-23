@@ -8,6 +8,21 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     @role = roles(:one)
   end
 
+  test "should get index as html" do
+    get survey_questions_url(@survey)
+    assert_response :redirect
+    assert_redirected_to survey_path(@survey)
+    assert_equal "text/html", @response.media_type
+  end
+
+  test "should get index as json" do
+    get survey_questions_url(@survey, format: :json)
+    assert_response :success
+    assert_equal "application/json", @response.media_type
+    body = JSON.parse(@response.body)
+    assert body.is_a?(Array)
+  end
+
   test "should get new" do
     get new_survey_question_url(@survey)
     assert_response :success

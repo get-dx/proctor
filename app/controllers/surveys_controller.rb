@@ -18,6 +18,10 @@ class SurveysController < ApplicationController
     @survey = Survey.new(survey_params)
 
     if @survey.save
+      # Create a SurveyBranch for each Role
+      Role.find_each do |role|
+        SurveyBranch.create!(survey: @survey, role: role, name: "#{role.name} Branch")
+      end
       redirect_to @survey, notice: 'Survey was successfully created.'
     else
       render :new, status: :unprocessable_entity

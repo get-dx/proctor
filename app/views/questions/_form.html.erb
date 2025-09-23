@@ -64,15 +64,19 @@
     </p>
   </div>
   <div>
-    <%= form.label :role_id, "Role", class: "block text-sm font-medium text-gray-700" %>
-    <% if question.new_record? %>
-      <%= form.collection_select :survey_branch_id, @survey.survey_branches.includes(:role), :id, ->(sb) { sb.role.name }, { prompt: "Select a branch/role" }, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
-    <% else %>
-      <% branch = question.survey_branches.find_by(survey_id: @survey.id) %>
-        <div class="mt-1 p-2 bg-gray-100 rounded text-gray-700">
-          <%= branch&.role&.name || "No role assigned" %>
-        </div>
-    <% end %> 
+    <%= form.label :survey_branch_ids, "Roles", class: "block text-sm font-medium text-gray-700" %>
+    <%= form.collection_select :survey_branch_ids,
+          @survey.survey_branches.includes(:role),
+          :id,
+          ->(sb) { sb.role.name },
+          { prompt: "Select one or more roles" },
+          {
+            multiple: true,
+            class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+          } %>
+    <p class="mt-2 text-sm text-gray-500">
+      Hold Ctrl (Windows) or Command (Mac) to select multiple roles.
+    </p>
   </div>
   <div class="flex items-start">
     <div class="flex items-center h-5">
