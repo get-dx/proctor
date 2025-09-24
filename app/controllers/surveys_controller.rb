@@ -55,7 +55,7 @@ class SurveysController < ApplicationController
   
   def submit
     responses = params[:response][:responses]
-    if responses.present?
+    if responses.present? && responses.any?
       responses.each do |response_params|
         @survey.responses.create(
           question_id: response_params[:question_id],

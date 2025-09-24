@@ -22,6 +22,13 @@ class RolesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to role_url(Role.last)
   end
 
+  test "should not create role with invalid params" do
+    assert_no_difference('Role.count') do
+      post roles_url, params: { role: { name: "" } }
+    end
+    assert_response :unprocessable_entity
+  end
+
   test "should show role" do
     get role_url(@role)
     assert_response :success
@@ -35,6 +42,13 @@ class RolesControllerTest < ActionDispatch::IntegrationTest
   test "should update role" do
     patch role_url(@role), params: { role: { name: "UpdatedRole" } }
     assert_redirected_to role_url(@role)
+  end
+
+  test "should not update role with invalid params" do
+    patch role_url(@role), params: { role: { name: "" } }
+    assert_response :unprocessable_entity
+    @role.reload
+    assert_not_equal "", @role.name
   end
 
   test "should destroy role" do

@@ -7,9 +7,9 @@
     <% @roles.each do |role| %>
       <li class="py-4 flex justify-between items-center">
         <span class="text-gray-800"><%= link_to role.name, role, class: "hover:underline" %></span>
-        <div class="space-x-2">
-          <%= link_to 'Edit', edit_role_path(role), class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200" %>
-          <%= link_to 'Destroy', role, method: :delete, data: { confirm: 'Are you sure?' }, class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200" %>
+        <div class="flex space-x-2">
+          <%= link_to "Edit", edit_role_path(role), class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200" %>
+          <%= button_to "Delete", role_path(role), method: :delete, class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200", form: { data: { turbo_confirm: "Are you sure you want to delete this role?" } } %>
         </div>
       </li>
     <% end %>

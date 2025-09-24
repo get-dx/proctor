@@ -4,4 +4,6 @@ class Survey < ApplicationRecord
   has_many :branch_questions, through: :survey_branches
   has_many :questions, through: :branch_questions
   has_many :responses, dependent: :destroy
+
+  validates :title, presence: true
 end
