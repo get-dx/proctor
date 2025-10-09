@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   resources :surveys do
     # Nested routes for questions
     resources :questions, except: [:show]
-    
+    get 'analytics', to: 'branch_analytics#show'
     # Route for taking a survey
     member do
       get 'take'

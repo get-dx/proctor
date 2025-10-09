@@ -1,0 +1,213 @@
+<!-- filepath: /home/deol/proctor/app/views/branch_analytics/show.html.erb -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Analytics for "<%= @survey.title %>"</h1>
+    <p class="mt-2 text-gray-600"><%= @survey.description %></p>
+    
+    <%= link_to "← Back to Survey", survey_path(@survey), class: "mt-4 inline-flex items-center text-indigo-600 hover:text-indigo-900" %>
+  </div>
+
+  <!-- Overview Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-indigo-500 rounded-md flex items-center justify-center">
+              <span class="text-white font-semibold">R</span>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Total Responses</dt>
+              <dd class="text-lg font-medium text-gray-900"><%= @analytics[:overview][:total_responses] %></dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+              <span class="text-white font-semibold">B</span>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Active Branches</dt>
+              <dd class="text-lg font-medium text-gray-900"><%= @analytics[:overview][:total_branches] %></dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+              <span class="text-white font-semibold">Q</span>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Total Questions</dt>
+              <dd class="text-lg font-medium text-gray-900"><%= @analytics[:overview][:total_questions] %></dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+              <span class="text-white font-semibold">%</span>
+            </div>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Response Rate</dt>
+              <dd class="text-lg font-medium text-gray-900"><%= @analytics[:overview][:response_rate] %>%</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Branch Comparison Section -->
+  <div class="bg-white shadow overflow-hidden sm:rounded-md mb-8">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">Branch Comparison</h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">Response data breakdown by role/branch</p>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responses</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Questions</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completion Rate</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Response Length</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @analytics[:by_branch].each do |branch| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900"><%= branch[:role] %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900"><%= branch[:total_responses] %></div>
+                <div class="text-sm text-gray-500"><%= pluralize(branch[:unique_respondents], 'unique respondent') %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <%= branch[:questions_count] %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                    <div class="bg-indigo-600 h-2 rounded-full" style="width: <%= branch[:completion_rate] %>%"></div>
+                  </div>
+                  <span class="text-sm text-gray-600"><%= branch[:completion_rate] %>%</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <%= branch[:avg_response_length] %> chars
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Question Analysis Section -->
+  <div class="bg-white shadow overflow-hidden sm:rounded-md mb-8">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">Question Analysis</h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">Response breakdown by question across branches</p>
+    </div>
+    <div class="border-t border-gray-200">
+      <% @analytics[:question_analysis].each do |question| %>
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h4 class="text-sm font-medium text-gray-900"><%= question[:content] %></h4>
+              <p class="text-sm text-gray-500">Type: <%= question[:question_type].humanize %> • Total responses: <%= question[:total_responses] %></p>
+            </div>
+          </div>
+          
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <% question[:branches].each do |branch| %>
+              <div class="bg-gray-50 rounded-lg p-3">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm font-medium text-gray-900"><%= branch[:role] %></span>
+                  <span class="text-sm text-gray-500"><%= pluralize(branch[:response_count], 'response') %></span>
+                </div>
+                <% if branch[:sample_responses].any? %>
+                  <div class="text-xs text-gray-600">
+                    <div class="font-medium mb-1">Sample responses:</div>
+                    <% branch[:sample_responses].each do |response| %>
+                      <div class="mb-1">"<%= truncate(response, length: 50) %>"</div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Completion Statistics -->
+  <div class="bg-white shadow overflow-hidden sm:rounded-md">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">Completion Statistics</h3>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">Activity insights and trends</p>
+    </div>
+    <div class="px-4 py-5 sm:px-6">
+      <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Most Active Branch</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <% if @analytics[:completion_stats][:most_active_branch] %>
+              <%= @analytics[:completion_stats][:most_active_branch][:role] %> 
+              (<%= @analytics[:completion_stats][:most_active_branch][:total_responses] %> responses)
+            <% else %>
+              No data available
+            <% end %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Least Active Branch</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <% if @analytics[:completion_stats][:least_active_branch] %>
+              <%= @analytics[:completion_stats][:least_active_branch][:role] %> 
+              (<%= @analytics[:completion_stats][:least_active_branch][:total_responses] %> responses)
+            <% else %>
+              No data available
+            <% end %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Average Responses per Branch</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @analytics[:completion_stats][:average_responses_per_branch] %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Survey Created</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @survey.created_at.strftime("%B %d, %Y") %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</div>
