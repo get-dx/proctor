@@ -22,9 +22,15 @@ class SurveysController < ApplicationController
       Role.find_each do |role|
         SurveyBranch.create!(survey: @survey, role: role, name: "#{role.name} Branch")
       end
-      redirect_to @survey, notice: 'Survey was successfully created.'
+      respond_to do |format|
+        format.html { redirect_to @survey, notice: 'Survey was successfully created.' }
+        format.json { render json: { message: 'Survey created successfully' } }
+      end
     else
-      render :new, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: { errors: @survey.errors.full_messages }, status: :unprocessable_entity }
+      end
     end
   end
   
@@ -33,12 +39,18 @@ class SurveysController < ApplicationController
   
   def update
     if @survey.update(survey_params)
-      redirect_to @survey, notice: 'Survey was successfully updated.'
+      respond_to do |format|
+        format.html { redirect_to @survey, notice: 'Survey was successfully updated.' }
+        format.json { render json: { success: true, redirect_url: survey_path(@survey) }, status: :ok }
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: { errors: @survey.errors.full_messages }, status: :unprocessable_entity }
+      end
     end
   end
-  
+
   def destroy
     @survey.destroy
     redirect_to surveys_url, notice: 'Survey was successfully destroyed.'
@@ -62,12 +74,18 @@ class SurveysController < ApplicationController
           value: response_params[:content],
         )
       end
-      redirect_to surveys_path, notice: 'Thank you for completing the survey!'
+      respond_to do |format|
+        format.html { redirect_to surveys_path, notice: 'Thank you for completing the survey!' }
+        format.json { render json: { message: 'Thank you for completing the survey!' }, status: :created }
+      end
     else
-      redirect_to take_survey_path(@survey), alert: 'Please answer at least one question.'
+      respond_to do |format|
+        format.html { redirect_to take_survey_path(@survey), alert: 'Please answer at least one question.' }
+        format.json { render json: { error: 'Please answer at least one question.' }, status: :unprocessable_entity }
+      end
     end
-  end
-  
+  end 
+
   private
   
   def set_survey

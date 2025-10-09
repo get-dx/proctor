@@ -40,18 +40,23 @@ const QuestionList = (props) => {
       return;
     }
 
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    const csrfTokenElement = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = csrfTokenElement ? csrfTokenElement.content : '';
     
     try {
       const response = await fetch(`/surveys/${props.surveyId}/questions/${questionId}`, {
         method: 'DELETE',
         headers: {
-          'X-CSRF-Token': csrfToken
+          'X-CSRF-Token': csrfToken,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
       });
       
       if (response.ok) {
         setQuestions(questions.filter(q => q.id !== questionId));
+      } else {
+        console.error('Failed to delete question:', response.status);
       }
     } catch (error) {
       console.error('Error deleting question:', error);

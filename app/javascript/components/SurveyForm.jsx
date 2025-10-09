@@ -9,7 +9,8 @@ const SurveyForm = (props) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    const csrfTokenElement = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = csrfTokenElement ? csrfTokenElement.content : '';
     const url = props.survey?.id ? `/surveys/${props.survey.id}` : '/surveys';
     const method = props.survey?.id ? 'PATCH' : 'POST';
     
@@ -18,6 +19,7 @@ const SurveyForm = (props) => {
         method,
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'X-CSRF-Token': csrfToken
         },
         body: JSON.stringify({
@@ -27,9 +29,14 @@ const SurveyForm = (props) => {
           }
         })
       });
-      
+        
       if (response.ok) {
-        window.location.href = props.survey?.id ? `/surveys/${props.survey.id}` : '/surveys';
+        const data = await response.json();
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url;
+        } else {
+          window.location.href = props.survey?.id ? `/surveys/${props.survey.id}` : '/surveys';
+        }
       } else {
         const data = await response.json();
         setErrors(data.errors || ['An error occurred']);

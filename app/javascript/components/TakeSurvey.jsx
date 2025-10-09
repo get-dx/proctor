@@ -130,13 +130,15 @@ const TakeSurvey = (props) => {
       content: responses[questionId]
     }));
 
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    
+    const csrfTokenElement = document.querySelector('meta[name="csrf-token"]');
+    const csrfToken = csrfTokenElement ? csrfTokenElement.content : '';
+
     try {
       const response = await fetch(`/surveys/${survey.id}/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'X-CSRF-Token': csrfToken
         },
         body: JSON.stringify({
@@ -153,7 +155,8 @@ const TakeSurvey = (props) => {
         window.scrollTo(0, 0);
       } else {
         const data = await response.json();
-        setErrors(data.errors || ['There was an error submitting your response.']);
+        const errorMessages = data.errors || (data.error ? [data.error] : ['There was an error submitting your response.']);
+        setErrors(errorMessages);
       }
     } catch (error) {
       console.error('Error submitting response:', error);
@@ -342,9 +345,6 @@ const TakeSurvey = (props) => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">{survey.title}</h1>
-      <p className="mb-6">{survey.description}</p>
-      
       {errors.length > 0 && (
         <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
           <div className="flex">

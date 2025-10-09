@@ -60,7 +60,10 @@ class QuestionsController < ApplicationController
 
   def destroy
     @question.destroy
-    redirect_to survey_path(@survey), notice: 'Question was successfully destroyed.'
+    respond_to do |format|
+      format.json { head :no_content }
+      format.html { redirect_to survey_path(@survey), notice: 'Question was successfully destroyed.' }
+    end
   end
   
   private
@@ -70,7 +73,7 @@ class QuestionsController < ApplicationController
   end
   
   def set_question
-    @question = Question.find(params[:id])
+    @question = @survey.questions.find(params[:id])
   end
 
   def set_role

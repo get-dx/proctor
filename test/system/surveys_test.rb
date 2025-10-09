@@ -8,11 +8,18 @@ class SurveysTest < ApplicationSystemTestCase
     fill_in "Description", with: "Survey for system test"
     click_on "Create Survey"
     assert_text "System Test Survey"
-    click_on "Edit"
+    within("li", text: "System Test Survey") do
+      click_on "Edit"
+    end
     fill_in "Title", with: "Updated System Test Survey"
     click_on "Update Survey"
     assert_text "Updated System Test Survey"
-    click_on "Delete"
+    click_on "Back to Surveys"
+    within("li", text: "Updated System Test Survey") do
+      accept_confirm do
+        click_on "Delete"
+      end
+    end
     assert_no_text "Updated System Test Survey"
   end
 

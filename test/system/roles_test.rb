@@ -11,7 +11,13 @@ class RolesTest < ApplicationSystemTestCase
     fill_in "Name", with: "Updated System Test Role"
     click_on "Update Role"
     assert_text "Updated System Test Role"
-    click_on "Delete", match: :first
+    click_on "Back"
+    # Accept the confirmation alert when clicking Delete
+    within("li", text: "Updated System Test Role") do
+      accept_confirm do
+        click_on "Delete", match: :first
+      end
+    end
     assert_no_text "Updated System Test Role"
   end
 end
