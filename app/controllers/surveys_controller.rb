@@ -58,20 +58,39 @@ class SurveysController < ApplicationController
   
   def take
     @survey = Survey.find(params[:id])
-    @role = Role.find(params[:role])
+    @role = Role.find_by(id: params[:role])
+    
+    if @role.nil?
+      redirect_to survey_path(@survey), alert: 'Invalid role specified.'
+      return
+    end
+    
     @branch = @survey.survey_branches.find_by(role: @role)
+    
+    if @branch.nil?
+      redirect_to survey_path(@survey), alert: 'No questions available for this role.'
+      return
+    end
+    
     @questions = Question.joins(:branch_questions)
                         .where(branch_questions: { survey_branch_id: @branch.id })
                         .order(:position)
   end
   
   def submit
-    responses = params[:response][:responses]
-    if responses.present? && responses.any?
-      responses.each do |response_params|
+    responses_data = params[:response][:responses]
+    selected_role_id = params[:response][:role_id] || params[:role_id] # Check both locations
+    
+    if responses_data.present? && responses_data.any?
+      # Find the survey branch for the selected role
+      selected_role = Role.find_by(id: selected_role_id)
+      survey_branch = @survey.survey_branches.find_by(role: selected_role) if selected_role
+      
+      responses_data.each do |response_params|
         @survey.responses.create(
           question_id: response_params[:question_id],
           value: response_params[:content],
+          survey_branch: survey_branch
         )
       end
       respond_to do |format|
@@ -84,7 +103,7 @@ class SurveysController < ApplicationController
         format.json { render json: { error: 'Please answer at least one question.' }, status: :unprocessable_entity }
       end
     end
-  end 
+  end
 
   private
   

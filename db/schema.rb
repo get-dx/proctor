@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_08_28_034813) do
+ActiveRecord::Schema[7.0].define(version: 2025_10_10_212936) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -39,7 +39,9 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_28_034813) do
     t.text "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "survey_branch_id"
     t.index ["question_id"], name: "index_responses_on_question_id"
+    t.index ["survey_branch_id"], name: "index_responses_on_survey_branch_id"
     t.index ["survey_id"], name: "index_responses_on_survey_id"
   end
 
@@ -47,6 +49,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_28_034813) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_roles_on_name", unique: true
   end
 
   create_table "survey_branches", force: :cascade do |t|
@@ -69,6 +72,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_28_034813) do
   add_foreign_key "branch_questions", "questions"
   add_foreign_key "branch_questions", "survey_branches"
   add_foreign_key "responses", "questions"
+  add_foreign_key "responses", "survey_branches"
   add_foreign_key "responses", "surveys"
   add_foreign_key "survey_branches", "roles"
   add_foreign_key "survey_branches", "surveys"

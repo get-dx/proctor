@@ -9,7 +9,7 @@
     <div id="take-survey-container" 
          data-survey="<%= @survey.to_json %>" 
          data-questions="<%= @questions.to_json %>"
-         data-role="<%= params[:role] %>">
+         data-role="<%= @role.id %>">
     </div>
     
     <!-- Fallback for when JavaScript is disabled -->

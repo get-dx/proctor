@@ -6,8 +6,10 @@ class BranchAnalyticsController < ApplicationController
       overview: survey_overview,
       by_branch: branch_response_summary,
       question_analysis: question_breakdown,
-      completion_stats: completion_statistics
+      completion_stats: completion_statistics,
+      charts: chart_data
     }
+    @chart_data_json = chart_data.to_json
   end
 
   private
@@ -26,18 +28,15 @@ class BranchAnalyticsController < ApplicationController
   end
 
   def branch_response_summary
-    @survey.survey_branches.includes(:role, :branch_questions, branch_questions: { question: :responses }).map do |branch|
-      # Get responses for questions that belong to this branch
-      branch_responses = Response.joins(:question)
-                                .joins("JOIN branch_questions ON branch_questions.question_id = questions.id")
-                                .where(branch_questions: { survey_branch_id: branch.id })
-                                .where(survey_id: @survey.id)
+    @survey.survey_branches.includes(:role, :branch_questions).map do |branch|
+      # Get responses specifically for this survey branch
+      branch_responses = @survey.responses.where(survey_branch: branch)
       
       {
         role: branch.role.name,
         branch_id: branch.id,
         total_responses: branch_responses.count,
-        unique_respondents: branch_responses.distinct.count('responses.id'),
+        unique_respondents: branch_responses.distinct.count,
         questions_count: branch.branch_questions.count,
         avg_response_length: calculate_avg_response_length(branch_responses),
         completion_rate: calculate_branch_completion_rate(branch),
@@ -47,16 +46,16 @@ class BranchAnalyticsController < ApplicationController
   end
 
   def question_breakdown
-    @survey.questions.includes(:responses, :branch_questions, branch_questions: :survey_branch).map do |question|
+    @survey.questions.includes(:responses, :branch_questions).map do |question|
       {
         question_id: question.id,
         content: question.content,
         question_type: question.question_type,
         total_responses: question.responses.where(survey_id: @survey.id).count,
-        branches: question.branch_questions.includes(:survey_branch).map do |branch_question|
-          branch_responses = question.responses.where(survey_id: @survey.id)
+        branches: @survey.survey_branches.includes(:role).map do |branch|
+          branch_responses = question.responses.where(survey_id: @survey.id, survey_branch: branch)
           {
-            role: branch_question.survey_branch.role.name,
+            role: branch.role.name,
             response_count: branch_responses.count,
             sample_responses: branch_responses.limit(3).pluck(:value)
           }
@@ -92,21 +91,16 @@ class BranchAnalyticsController < ApplicationController
     total_questions = branch.branch_questions.count
     return 0 if total_questions.zero?
     
-    branch_responses = Response.joins(:question)
-                              .joins("JOIN branch_questions ON branch_questions.question_id = questions.id")
-                              .where(branch_questions: { survey_branch_id: branch.id })
-                              .where(survey_id: @survey.id)
+    branch_responses = @survey.responses.where(survey_branch: branch)
     
     (branch_responses.count.to_f / total_questions * 100).round(2)
   end
 
   def response_type_distribution(branch)
-    Response.joins(:question)
-           .joins("JOIN branch_questions ON branch_questions.question_id = questions.id")
-           .where(branch_questions: { survey_branch_id: branch.id })
-           .where(survey_id: @survey.id)
-           .group('questions.question_type')
-           .count
+    @survey.responses.where(survey_branch: branch)
+                     .joins(:question)
+                     .group('questions.question_type')
+                     .count
   end
 
   def response_timeline_data
@@ -136,5 +130,76 @@ class BranchAnalyticsController < ApplicationController
     return 0 if branch_data.empty?
     
     (branch_data.sum { |b| b[:total_responses] } / branch_data.count.to_f).round(2)
+  end
+
+  def chart_data
+    {
+      responses_by_branch: responses_by_branch_chart,
+      completion_rates: completion_rates_chart,
+      response_timeline: response_timeline_chart,
+      question_types: question_types_chart,
+      daily_responses: daily_responses_chart
+    }
+  end
+
+  def responses_by_branch_chart
+    @survey.survey_branches.includes(:role).map do |branch|
+      [branch.role.name, @survey.responses.where(survey_branch: branch).count]
+    end.to_h
+  end
+
+  def completion_rates_chart
+    @survey.survey_branches.includes(:role).map do |branch|
+      total_questions = branch.branch_questions.count
+      responses_count = @survey.responses.where(survey_branch: branch).count
+      completion_rate = total_questions > 0 ? (responses_count.to_f / total_questions * 100).round(1) : 0
+      [branch.role.name, completion_rate]
+    end.to_h
+  end
+
+  def response_timeline_chart
+    # Manual grouping by day for last 14 days
+    end_date = Date.current
+    start_date = end_date - 13.days
+    
+    # Get responses within date range
+    responses_in_range = @survey.responses.where(created_at: start_date.beginning_of_day..end_date.end_of_day)
+    
+    # Group by date and count
+    grouped_responses = responses_in_range.group("DATE(created_at)").count
+    
+    # Fill in missing dates with 0 count
+    result = {}
+    (start_date..end_date).each do |date|
+      date_key = date.strftime("%Y-%m-%d")
+      result[date_key] = grouped_responses[date] || 0
+    end
+    
+    result
+  end
+
+  def question_types_chart
+    @survey.questions.group(:question_type).count.transform_keys(&:humanize)
+  end
+
+  def daily_responses_chart
+    # Manual grouping by day for last 7 days
+    end_date = Date.current
+    start_date = end_date - 6.days
+    
+    # Get responses within date range
+    responses_in_range = @survey.responses.where(created_at: start_date.beginning_of_day..end_date.end_of_day)
+    
+    # Group by date and count
+    grouped_responses = responses_in_range.group("DATE(created_at)").count
+    
+    # Fill in missing dates with 0 count
+    result = {}
+    (start_date..end_date).each do |date|
+      date_key = date.strftime("%Y-%m-%d")
+      result[date_key] = grouped_responses[date] || 0
+    end
+    
+    result
   end
 end

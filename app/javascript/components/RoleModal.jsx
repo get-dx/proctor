@@ -44,9 +44,9 @@ const initializeRoleModal = () => {
               open={true}
               roles={roles} // Provide actual roles array
               value={""} // Provide actual value if needed
-              onSelect={async (role) => {
-                // Redirect to /surveys/:id/take?role=selectedRole
-                window.location.href = `/surveys/${surveyId}/take?role=${encodeURIComponent(role)}`;
+              onSelect={async (roleId) => {
+                // Redirect to /surveys/:id/take?role=selectedRoleId
+                window.location.href = `/surveys/${surveyId}/take?role=${roleId}`;
                 root.render(null); // Close modal after selection}} // Provide actual handler
               }}
               onClose={() => {

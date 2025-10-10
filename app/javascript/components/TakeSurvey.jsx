@@ -144,7 +144,7 @@ const TakeSurvey = (props) => {
         body: JSON.stringify({
           response: {
             survey_id: survey.id,
-            role: role,
+            role_id: role,
             responses: formattedResponses
           }
         })

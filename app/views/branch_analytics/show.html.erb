@@ -133,10 +133,45 @@
   <!-- Question Analysis Section -->
   <div class="bg-white shadow overflow-hidden sm:rounded-md mb-8">
     <div class="px-4 py-5 sm:px-6">
-      <h3 class="text-lg leading-6 font-medium text-gray-900">Question Analysis</h3>
-      <p class="mt-1 max-w-2xl text-sm text-gray-500">Response breakdown by question across branches</p>
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Question Analysis</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">Response breakdown by question across branches</p>
+        </div>
+        <button 
+          id="question-analysis-toggle"
+          class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+          onclick="toggleQuestionAnalysis()"
+        >
+          <span id="toggle-text">Show Details</span>
+          <svg id="toggle-icon" class="ml-2 -mr-0.5 h-4 w-4 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Summary when collapsed -->
+      <div id="question-summary" class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="text-2xl font-bold text-gray-900"><%= @analytics[:question_analysis].count %></div>
+          <div class="text-sm text-gray-500">Total Questions</div>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="text-2xl font-bold text-gray-900">
+            <%= @analytics[:question_analysis].sum { |q| q[:total_responses] } %>
+          </div>
+          <div class="text-sm text-gray-500">Total Question Responses</div>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="text-2xl font-bold text-gray-900">
+            <%= @analytics[:question_analysis].group_by { |q| q[:question_type] }.keys.count %>
+          </div>
+          <div class="text-sm text-gray-500">Question Types</div>
+        </div>
+      </div>
     </div>
-    <div class="border-t border-gray-200">
+    
+    <div id="question-details" class="border-t border-gray-200 hidden">
       <% @analytics[:question_analysis].each do |question| %>
         <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
           <div class="flex justify-between items-start">
@@ -168,6 +203,32 @@
       <% end %>
     </div>
   </div>
+
+  <script>
+    function toggleQuestionAnalysis() {
+      const details = document.getElementById('question-details');
+      const summary = document.getElementById('question-summary');
+      const toggleText = document.getElementById('toggle-text');
+      const toggleIcon = document.getElementById('toggle-icon');
+      
+      if (details.classList.contains('hidden')) {
+        // Show details
+        details.classList.remove('hidden');
+        summary.classList.add('hidden');
+        toggleText.textContent = 'Hide Details';
+        toggleIcon.style.transform = 'rotate(180deg)';
+      } else {
+        // Hide details
+        details.classList.add('hidden');
+        summary.classList.remove('hidden');
+        toggleText.textContent = 'Show Details';
+        toggleIcon.style.transform = 'rotate(0deg)';
+      }
+    }
+  </script>
+
+  <!-- React Charts Section -->
+  <div id="analytics-charts" data-chart-data="<%= html_escape(@chart_data_json) %>"></div>
 
   <!-- Completion Statistics -->
   <div class="bg-white shadow overflow-hidden sm:rounded-md">
