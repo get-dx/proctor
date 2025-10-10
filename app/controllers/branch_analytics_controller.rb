@@ -28,9 +28,8 @@ class BranchAnalyticsController < ApplicationController
   end
 
   def branch_response_summary
-    @survey.survey_branches.includes(:role, :branch_questions).map do |branch|
-      # Get responses specifically for this survey branch
-      branch_responses = @survey.responses.where(survey_branch: branch)
+    survey_branches_with_associations.map do |branch|
+      branch_responses = responses_for_branch(branch)
       
       {
         role: branch.role.name,
@@ -91,16 +90,16 @@ class BranchAnalyticsController < ApplicationController
     total_questions = branch.branch_questions.count
     return 0 if total_questions.zero?
     
-    branch_responses = @survey.responses.where(survey_branch: branch)
+    branch_responses = responses_for_branch(branch)
     
     (branch_responses.count.to_f / total_questions * 100).round(2)
   end
 
   def response_type_distribution(branch)
-    @survey.responses.where(survey_branch: branch)
-                     .joins(:question)
-                     .group('questions.question_type')
-                     .count
+    responses_for_branch(branch)
+      .joins(:question)
+      .group('questions.question_type')
+      .count
   end
 
   def response_timeline_data
@@ -143,39 +142,20 @@ class BranchAnalyticsController < ApplicationController
   end
 
   def responses_by_branch_chart
-    @survey.survey_branches.includes(:role).map do |branch|
-      [branch.role.name, @survey.responses.where(survey_branch: branch).count]
+    survey_branches_with_associations.map do |branch|
+      [branch.role.name, responses_for_branch(branch).count]
     end.to_h
   end
 
   def completion_rates_chart
-    @survey.survey_branches.includes(:role).map do |branch|
-      total_questions = branch.branch_questions.count
-      responses_count = @survey.responses.where(survey_branch: branch).count
-      completion_rate = total_questions > 0 ? (responses_count.to_f / total_questions * 100).round(1) : 0
+    survey_branches_with_associations.map do |branch|
+      completion_rate = calculate_branch_completion_rate(branch).round(1)
       [branch.role.name, completion_rate]
     end.to_h
   end
 
   def response_timeline_chart
-    # Manual grouping by day for last 14 days
-    end_date = Date.current
-    start_date = end_date - 13.days
-    
-    # Get responses within date range
-    responses_in_range = @survey.responses.where(created_at: start_date.beginning_of_day..end_date.end_of_day)
-    
-    # Group by date and count
-    grouped_responses = responses_in_range.group("DATE(created_at)").count
-    
-    # Fill in missing dates with 0 count
-    result = {}
-    (start_date..end_date).each do |date|
-      date_key = date.strftime("%Y-%m-%d")
-      result[date_key] = grouped_responses[date] || 0
-    end
-    
-    result
+    responses_by_date_range(14)
   end
 
   def question_types_chart
@@ -183,9 +163,21 @@ class BranchAnalyticsController < ApplicationController
   end
 
   def daily_responses_chart
-    # Manual grouping by day for last 7 days
+    responses_by_date_range(7)
+  end
+
+  # Helper methods for DRY code
+  def survey_branches_with_associations
+    @survey_branches_with_associations ||= @survey.survey_branches.includes(:role, :branch_questions)
+  end
+
+  def responses_for_branch(branch)
+    @survey.responses.where(survey_branch: branch)
+  end
+
+  def responses_by_date_range(days)
     end_date = Date.current
-    start_date = end_date - 6.days
+    start_date = end_date - (days - 1).days
     
     # Get responses within date range
     responses_in_range = @survey.responses.where(created_at: start_date.beginning_of_day..end_date.end_of_day)
