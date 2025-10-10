@@ -1,17 +1,36 @@
-<div class="max-w-2xl mx-auto mt-8 bg-white shadow rounded-lg p-6">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Roles</h1>
-    <%= link_to 'New Role', new_role_path, class: "inline-block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700" %>
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Roles</h1>
+      <p class="mt-1 max-w-2xl text-sm text-gray-500">A list of all available roles.</p>
+    </div>
+    <div>
+      <%= link_to "New Role", new_role_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+    </div>
   </div>
-  <ul class="divide-y divide-gray-200">
-    <% @roles.each do |role| %>
-      <li class="py-4 flex justify-between items-center">
-        <span class="text-gray-800"><%= link_to role.name, role, class: "hover:underline" %></span>
-        <div class="flex space-x-2">
-          <%= link_to "Edit", edit_role_path(role), class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200" %>
-          <%= button_to "Delete", role_path(role), method: :delete, class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200", form: { data: { turbo_confirm: "Are you sure you want to delete this role?" } } %>
-        </div>
-      </li>
-    <% end %>
-  </ul>
+
+  <% if @roles.any? %>
+    <div class="border-t border-gray-200">
+      <ul role="list" class="divide-y divide-gray-200">
+        <% @roles.each do |role| %>
+          <li class="px-4 py-4 sm:px-6">
+            <div class="flex items-center justify-between">
+              <div class="flex flex-col">
+                <h2 class="text-lg font-medium text-indigo-600"><%= link_to role.name, role %></h2>
+              </div>
+              <div class="flex space-x-2">
+                <%= link_to "View", role_path(role), class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200" %>
+                <%= link_to "Edit", edit_role_path(role), class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200" %>
+                <%= button_to "Delete", role_path(role), method: :delete, class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200", form: { data: { turbo_confirm: "Are you sure you want to delete this role?" } } %>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% else %>
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <p class="text-gray-500">No roles found.</p>
+    </div>
+  <% end %>
 </div>

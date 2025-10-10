@@ -8,14 +8,28 @@ import RoleModal from "./RoleModal"
 import RoleSelect from "./RoleSelect"
 import AnalyticsCharts from "./AnalyticsCharts"
 
-// Initialize React components when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize AnalyticsCharts component
+// Initialize React components
+function initializeAnalyticsCharts() {
   const analyticsChartsElement = document.getElementById('analytics-charts');
   if (analyticsChartsElement) {
     const chartData = JSON.parse(analyticsChartsElement.dataset.chartData);
     const root = createRoot(analyticsChartsElement);
     root.render(<AnalyticsCharts chartData={chartData} />);
+  }
+}
+
+// Initialize React components when DOM is loaded (for initial page load)
+document.addEventListener('DOMContentLoaded', initializeAnalyticsCharts);
+
+// Initialize React components when Turbo navigates to a new page
+document.addEventListener('turbo:load', initializeAnalyticsCharts);
+
+// Clean up when navigating away (optional, helps prevent memory leaks)
+document.addEventListener('turbo:before-cache', () => {
+  const analyticsChartsElement = document.getElementById('analytics-charts');
+  if (analyticsChartsElement) {
+    // Clear the element to prevent issues with Turbo caching
+    analyticsChartsElement.innerHTML = '';
   }
 });
 
