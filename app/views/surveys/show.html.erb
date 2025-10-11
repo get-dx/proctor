@@ -25,8 +25,8 @@
       <select id="survey-branch-filter"
               class="mt-1 block w-64 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
         <option value="">All Roles</option>
-        <% @survey.survey_branches.includes(:role).each do |branch| %>
-          <option value="<%= branch.id %>"><%= branch.role.name %></option>
+        <% @all_roles.each do |role| %>
+          <option value="<%= role.id %>"><%= role.display_name %></option>
         <% end %>
       </select>
     </div>

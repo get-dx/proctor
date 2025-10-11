@@ -7,7 +7,7 @@ class QuestionsTest < ApplicationSystemTestCase
     click_on "Add Question"
     fill_in "Question Text", with: "System test question"
     select "text", from: "Question type"
-    select "FRONTEND ENGINEER", from: "Roles"
+        select "Frontend Engineer", from: "Roles"
     click_on "Create Question"
     assert_text "System test question"
     within("li", text: "System test question") do

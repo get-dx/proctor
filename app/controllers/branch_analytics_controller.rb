@@ -32,7 +32,7 @@ class BranchAnalyticsController < ApplicationController
       branch_responses = responses_for_branch(branch)
       
       {
-        role: branch.role.name,
+        role: branch.role.display_name,
         branch_id: branch.id,
         total_responses: branch_responses.count,
         unique_respondents: branch_responses.distinct.count,
@@ -54,7 +54,7 @@ class BranchAnalyticsController < ApplicationController
         branches: @survey.survey_branches.includes(:role).map do |branch|
           branch_responses = question.responses.where(survey_id: @survey.id, survey_branch: branch)
           {
-            role: branch.role.name,
+            role: branch.role.display_name,
             response_count: branch_responses.count,
             sample_responses: branch_responses.limit(3).pluck(:value)
           }
@@ -143,14 +143,14 @@ class BranchAnalyticsController < ApplicationController
 
   def responses_by_branch_chart
     survey_branches_with_associations.map do |branch|
-      [branch.role.name, responses_for_branch(branch).count]
+      [branch.role.display_name, responses_for_branch(branch).count]
     end.to_h
   end
 
   def completion_rates_chart
     survey_branches_with_associations.map do |branch|
       completion_rate = calculate_branch_completion_rate(branch).round(1)
-      [branch.role.name, completion_rate]
+      [branch.role.display_name, completion_rate]
     end.to_h
   end
 

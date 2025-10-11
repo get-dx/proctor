@@ -6,9 +6,20 @@ class Role < ApplicationRecord
   
   before_validation :normalize_name
 
+  def display_name
+    return nil unless name.present?
+    
+    # Common acronyms that should stay uppercase
+    acronyms = %w[QA UI UX API CEO CTO VP IT HR AI ML]
+    
+    name.titleize.split.map do |word|
+      acronyms.include?(word.upcase) ? word.upcase : word
+    end.join(' ')
+  end
+
   private
 
   def normalize_name
-    self.name = name.strip.upcase if name.present?
+    self.name = name.strip.downcase if name.present?
   end
 end

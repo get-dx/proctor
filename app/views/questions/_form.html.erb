@@ -68,7 +68,7 @@
     <%= form.collection_select :survey_branch_ids,
           @survey.survey_branches.includes(:role),
           :id,
-          ->(sb) { sb.role.name },
+          ->(sb) { sb.role.display_name },
           { prompt: "Select one or more roles" },
           {
             multiple: true,

@@ -16,7 +16,7 @@
           <li class="px-4 py-4 sm:px-6">
             <div class="flex items-center justify-between">
               <div class="flex flex-col">
-                <h2 class="text-lg font-medium text-indigo-600"><%= link_to role.name, role %></h2>
+                <h2 class="text-lg font-medium text-indigo-600"><%= link_to role.display_name, role %></h2>
               </div>
               <div class="flex space-x-2">
                 <%= link_to "View", role_path(role), class: "inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200" %>

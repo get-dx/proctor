@@ -15,8 +15,8 @@ Question.destroy_all
 BranchQuestion.destroy_all
 
 # Create roles
-roles = ["Data Engineer", "Frontend Engineer", "QA Engineer", "UX Designer", "Backend Engineer", "Product Manager"].map do |role_name|
-  Role.create!(name: role_name.upcase)
+roles = ["Data Engineer", "Frontend Engineer", "QA Engineer", "UX Designer", "Backend Engineer", "Product Manager", "UI Designer", "API Developer"].map do |role_name|
+  Role.create!(name: role_name)
 end
 
 # Create engineering team survey
@@ -26,8 +26,9 @@ engineering_survey = Survey.create!(
   description: "This survey helps us understand the satisfaction and needs of our engineering team members."
 )
 
-# Create branches for each role
-engineering_survey_branches = roles.map do |role|
+# Create branches only for engineering roles
+engineering_roles = roles.select { |role| role.name.downcase.include?('engineer') || role.name.downcase.include?('developer') }
+engineering_survey_branches = engineering_roles.map do |role|
   SurveyBranch.create!(survey: engineering_survey, role: role, name: "#{role.name} Branch")
 end
 
@@ -113,8 +114,9 @@ retrospective_survey = Survey.create!(
   description: "Help us understand what went well and what could be improved in our recent project."
 )
 
-# Create branches for each role
-project_retrospective_survey_branches = roles.map do |role|
+# Create branches for project-involved roles (exclude pure design roles for this survey)
+project_roles = roles.reject { |role| role.name.downcase.include?('designer') }
+project_retrospective_survey_branches = project_roles.map do |role|
   SurveyBranch.create!(survey: retrospective_survey, role: role, name: "#{role.name} Branch")
 end
 
@@ -200,8 +202,14 @@ customer_survey = Survey.create!(
   description: "We value your feedback! Please help us improve our products and services."
 )
 
-# Create branches for each role
-customer_survey_branches = roles.map do |role|
+# Create branches for customer-facing roles
+customer_facing_roles = roles.select { |role| 
+  role.name.downcase.include?('product') || 
+  role.name.downcase.include?('frontend') || 
+  role.name.downcase.include?('ux') || 
+  role.name.downcase.include?('ui') 
+}
+customer_survey_branches = customer_facing_roles.map do |role|
   SurveyBranch.create!(survey: customer_survey, role: role, name: "#{role.name} Branch")
 end
 
@@ -264,6 +272,75 @@ customer_questions = [
 
 customer_survey_branches.each do |branch|
   customer_questions.each do |question|
+    BranchQuestion.create!(survey_branch: branch, question: question)
+  end
+end
+
+# Create QA-specific survey
+puts "Creating QA and testing survey..."
+qa_survey = Survey.create!(
+  title: "Quality Assurance & Testing Practices Survey",
+  description: "Help us understand our testing processes and quality assurance practices."
+)
+
+# Create branches only for QA roles
+qa_roles = roles.select { |role| role.name.downcase.include?('qa') || role.name.downcase.include?('engineer') }
+qa_survey_branches = qa_roles.map do |role|
+  SurveyBranch.create!(survey: qa_survey, role: role, name: "#{role.name} Branch")
+end
+
+# Create QA-specific questions
+puts "Creating questions for QA survey..."
+qa_questions = [
+  {
+    content: "How confident are you in our current testing coverage?",
+    question_type: "rating",
+    position: 1,
+    required: true
+  },
+  {
+    content: "Which types of testing do you regularly perform?",
+    question_type: "checkbox",
+    position: 2,
+    required: true,
+    options: ["Unit Testing", "Integration Testing", "End-to-End Testing", "Manual Testing", "Performance Testing", "Security Testing", "Accessibility Testing", "API Testing"]
+  },
+  {
+    content: "What testing tools do you use most frequently?",
+    question_type: "checkbox",
+    position: 3,
+    required: false,
+    options: ["Jest", "Cypress", "Selenium", "Postman", "JMeter", "SonarQube", "TestRail", "Jira", "Other"]
+  },
+  {
+    content: "How would you rate the quality of our bug reporting process?",
+    question_type: "rating",
+    position: 4,
+    required: true
+  },
+  {
+    content: "What are the biggest challenges in maintaining test quality?",
+    question_type: "long_text",
+    position: 5,
+    required: false
+  },
+  {
+    content: "How often do you encounter flaky tests?",
+    question_type: "multiple_choice",
+    position: 6,
+    required: true,
+    options: ["Never", "Rarely", "Sometimes", "Often", "Very often"]
+  },
+  {
+    content: "What improvements would help you be more effective in testing?",
+    question_type: "text",
+    position: 7,
+    required: false
+  }
+].map { |attrs| Question.create!(attrs) }
+
+qa_survey_branches.each do |branch|
+  qa_questions.each do |question|
     BranchQuestion.create!(survey_branch: branch, question: question)
   end
 end

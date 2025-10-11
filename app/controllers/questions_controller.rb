@@ -11,6 +11,10 @@ class QuestionsController < ApplicationController
       @questions = @questions.joins(:branch_questions)
                             .where(branch_questions: { survey_branch_id: params[:survey_branch_id] })
                             .distinct
+    elsif params[:role_id].present?
+      @questions = @questions.joins(branch_questions: { survey_branch: :role })
+                            .where(roles: { id: params[:role_id] })
+                            .distinct
     end
 
     @questions = @questions.order(:position) if @questions.column_names.include?("position")
@@ -77,7 +81,7 @@ class QuestionsController < ApplicationController
   end
 
   def set_role
-    @role = Role.find_by(name: params[:role].upcase) if params[:role].present?
+    @role = Role.find_by(name: params[:role].downcase) if params[:role].present?
   end
 
   def set_roles

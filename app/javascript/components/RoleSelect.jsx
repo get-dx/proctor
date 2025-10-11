@@ -15,9 +15,9 @@ const RoleSelect = ({ roles, value, onChange, label = "Select Role" }) => {
       >
         <option value="">-- Choose a role --</option>
         {roles.map(role => (
-                <option key={role.id} value={role.id}>
-        {role.name}
-      </option>
+          <option key={role.id} value={role.id}>
+            {role.name}
+          </option>
         ))}
       </select>
     </div>

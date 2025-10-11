@@ -26,7 +26,7 @@ class SurveysTest < ApplicationSystemTestCase
   test "user can take a survey" do
     visit surveys_path
     click_on "Take Survey", match: :first
-    select "FRONTEND ENGINEER", from: "role-select"
+    select "Frontend Engineer", from: "role-select"
     assert_text "Question"
     fill_in "Question for FRONTEND ENGINEER", with: "Test answer"
     fill_in "Question for DATA ENGINEER", with: "Test answer"

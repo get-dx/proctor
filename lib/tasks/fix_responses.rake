@@ -16,12 +16,12 @@ namespace :data do
       if survey_branches.count == 1
         # Only one branch contains this question, assign it
         response.update!(survey_branch: survey_branches.first)
-        puts "  -> Assigned to branch: #{survey_branches.first.role.name}"
+        puts "  -> Assigned to branch: #{survey_branches.first.role.display_name}"
       elsif survey_branches.count > 1
         # Multiple branches contain this question, we need to make an assumption
         # For now, assign to the first branch (you might want to modify this logic)
         response.update!(survey_branch: survey_branches.first)
-        puts "  -> Multiple branches found, assigned to: #{survey_branches.first.role.name}"
+        puts "  -> Multiple branches found, assigned to: #{survey_branches.first.role.display_name}"
       else
         puts "  -> WARNING: No branch found for this question!"
       end
@@ -42,7 +42,7 @@ namespace :data do
       puts "  #{survey.title}:"
       puts "    Total responses: #{survey.responses.count}"
       survey.survey_branches.includes(:role).each do |branch|
-        puts "    #{branch.role.name}: #{survey.responses.where(survey_branch: branch).count} responses"
+        puts "    #{branch.role.display_name}: #{survey.responses.where(survey_branch: branch).count} responses"
       end
     end
   end

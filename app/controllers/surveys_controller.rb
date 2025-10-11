@@ -3,11 +3,12 @@ class SurveysController < ApplicationController
 
   def index
     @surveys = Survey.all
-    @roles = Role.all
+    @roles = Role.all.map { |role| { id: role.id, name: role.display_name } }
   end
 
   def show
-    @roles = Role.all
+    @roles = Role.all.map { |role| { id: role.id, name: role.display_name } }
+    @all_roles = Role.all
   end
 
   def new

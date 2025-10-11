@@ -1,8 +1,10 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: DATA ENGINEER
+  name: data engineer
 two:
-  name: FRONTEND ENGINEER
+  name: frontend engineer
 three:
-  name: PRODUCT MANAGER
+  name: product manager
+four:
+  name: qa engineer

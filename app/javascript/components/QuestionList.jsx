@@ -5,10 +5,10 @@ const QuestionList = (props) => {
   const [questions, setQuestions] = useState(props.questions || []);
   const [loading, setLoading] = useState(false);
 
-  const fetchQuestions = async (surveyBranchId = "") => {
+  const fetchQuestions = async (roleId = "") => {
     setLoading(true);
     try {
-      const url = `/surveys/${props.surveyId}/questions.json` + (surveyBranchId ? `?survey_branch_id=${encodeURIComponent(surveyBranchId)}` : "");
+      const url = `/surveys/${props.surveyId}/questions.json` + (roleId ? `?role_id=${encodeURIComponent(roleId)}` : "");
       const res = await fetch(url, { headers: { "Accept": "application/json" } });
       if (!res.ok) throw new Error("Failed to load questions");
       const data = await res.json();
