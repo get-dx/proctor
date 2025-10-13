@@ -38,16 +38,15 @@ const initializeRoleModal = () => {
         link.addEventListener("click", function(e) {
           e.preventDefault();
           const surveyId = this.dataset.surveyId;
-          // Render your React RoleModal, passing surveyId as a prop
           root.render(
               <RoleModal
               open={true}
-              roles={roles} // Provide actual roles array
-              value={""} // Provide actual value if needed
+              roles={roles} 
+              value={""} 
               onSelect={async (roleId) => {
                 // Redirect to /surveys/:id/take?role=selectedRoleId
                 window.location.href = `/surveys/${surveyId}/take?role=${roleId}`;
-                root.render(null); // Close modal after selection}} // Provide actual handler
+                root.render(null); // Close modal after selection
               }}
               onClose={() => {
                 modalOpen = false;
