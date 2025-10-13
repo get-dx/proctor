@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_10_10_212936) do
+ActiveRecord::Schema[7.0].define(version: 2025_10_13_192304) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -19,6 +19,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_10_10_212936) do
     t.bigint "question_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_branch_questions_on_deleted_at"
     t.index ["question_id"], name: "index_branch_questions_on_question_id"
     t.index ["survey_branch_id"], name: "index_branch_questions_on_survey_branch_id"
   end
@@ -31,6 +33,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_10_10_212936) do
     t.datetime "updated_at", null: false
     t.text "options"
     t.boolean "required"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_questions_on_deleted_at"
   end
 
   create_table "responses", force: :cascade do |t|
@@ -40,6 +44,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_10_10_212936) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "survey_branch_id"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_responses_on_deleted_at"
     t.index ["question_id"], name: "index_responses_on_question_id"
     t.index ["survey_branch_id"], name: "index_responses_on_survey_branch_id"
     t.index ["survey_id"], name: "index_responses_on_survey_id"
@@ -49,6 +55,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_10_10_212936) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_roles_on_deleted_at"
     t.index ["name"], name: "index_roles_on_name", unique: true
   end
 
@@ -58,6 +66,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_10_10_212936) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_survey_branches_on_deleted_at"
     t.index ["role_id"], name: "index_survey_branches_on_role_id"
     t.index ["survey_id"], name: "index_survey_branches_on_survey_id"
   end
@@ -67,6 +77,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_10_10_212936) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_surveys_on_deleted_at"
   end
 
   add_foreign_key "branch_questions", "questions"

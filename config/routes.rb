@@ -4,15 +4,26 @@ Rails.application.routes.draw do
   # Set the root path to the surveys index
   root "surveys#index"
   
-  resources :roles
-
-  # RESTful routes for surveys
+  resources :roles do
+    member do
+      patch 'restore'
+    end
+    collection do
+      get 'deleted'
+    end
+  end
+  
   resources :surveys do
     # Nested routes for questions
-    resources :questions, except: [:show]
+    resources :questions, except: [:show] do
+      member do
+        patch 'restore'
+      end
+    end
     get 'analytics', to: 'branch_analytics#show'
     # Route for taking a survey
     member do
+      patch 'restore'
       get 'take'
       post 'submit'
     end

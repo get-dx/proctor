@@ -9,8 +9,14 @@ export default class extends Controller {
   }
 
   toggleOptionsField() {
-    const questionType = document.getElementById('question_question_type').value
-    const optionsField = document.getElementById('options-field')
+    const questionTypeSelect = this.element.querySelector('select[name="question[question_type]"]')
+    const questionType = questionTypeSelect ? questionTypeSelect.value : null
+    
+    if (!this.hasOptionsFieldTarget) {
+      return
+    }
+    
+    const optionsField = this.optionsFieldTarget
     
     if (['multiple_choice', 'checkbox'].includes(questionType)) {
       optionsField.classList.remove('hidden')

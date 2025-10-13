@@ -2,12 +2,14 @@ class BranchAnalyticsController < ApplicationController
   before_action :set_survey
 
   def show
+    @show_deleted = params[:show_deleted] == 'true'
     @analytics = {
       overview: survey_overview,
       by_branch: branch_response_summary,
       question_analysis: question_breakdown,
       completion_stats: completion_statistics,
-      charts: chart_data
+      charts: chart_data,
+      deletion_summary: deletion_summary
     }
     @chart_data_json = chart_data.to_json
   end
@@ -20,10 +22,13 @@ class BranchAnalyticsController < ApplicationController
 
   def survey_overview
     {
-      total_responses: @survey.responses.count,
-      total_branches: @survey.survey_branches.count,
-      total_questions: @survey.questions.count,
-      response_rate: calculate_overall_response_rate
+      total_responses: responses_scope.count,
+      total_branches: branches_scope.count,
+      total_questions: questions_scope.count,
+      response_rate: calculate_overall_response_rate,
+      deleted_responses: @survey.responses.only_deleted.count,
+      deleted_branches: @survey.survey_branches.only_deleted.count,
+      deleted_questions: @survey.questions.only_deleted.count
     }
   end
 
@@ -45,13 +50,13 @@ class BranchAnalyticsController < ApplicationController
   end
 
   def question_breakdown
-    @survey.questions.includes(:responses, :branch_questions).map do |question|
+    questions_scope.includes(:responses, :branch_questions).map do |question|
       {
         question_id: question.id,
         content: question.content,
         question_type: question.question_type,
         total_responses: question.responses.where(survey_id: @survey.id).count,
-        branches: @survey.survey_branches.includes(:role).map do |branch|
+        branches: branches_scope.includes(:role).map do |branch|
           branch_responses = question.responses.where(survey_id: @survey.id, survey_branch: branch)
           {
             role: branch.role.display_name,
@@ -72,11 +77,20 @@ class BranchAnalyticsController < ApplicationController
     }
   end
 
+  def deletion_summary
+    {
+      deleted_responses_by_date: deleted_responses_timeline,
+      deleted_questions_by_type: deleted_questions_by_type,
+      deleted_branches_by_role: deleted_branches_by_role,
+      recent_deletions: recent_deletions
+    }
+  end
+
   def calculate_overall_response_rate
-    total_possible = @survey.survey_branches.joins(:branch_questions).count
+    total_possible = branches_scope.joins(:branch_questions).count
     return 0 if total_possible.zero?
     
-    (@survey.responses.count.to_f / total_possible * 100).round(2)
+    (responses_scope.count.to_f / total_possible * 100).round(2)
   end
 
   def calculate_avg_response_length(responses)
@@ -103,7 +117,7 @@ class BranchAnalyticsController < ApplicationController
   end
 
   def response_timeline_data
-    @survey.responses
+    responses_scope
         .where('created_at >= ?', 30.days.ago)
         .group("DATE(created_at)")
         .order("DATE(created_at)")
@@ -159,7 +173,7 @@ class BranchAnalyticsController < ApplicationController
   end
 
   def question_types_chart
-    @survey.questions.group(:question_type).count.transform_keys(&:humanize)
+    questions_scope.group(:question_type).count.transform_keys(&:humanize)
   end
 
   def daily_responses_chart
@@ -168,11 +182,23 @@ class BranchAnalyticsController < ApplicationController
 
   # Helper methods for DRY code
   def survey_branches_with_associations
-    @survey_branches_with_associations ||= @survey.survey_branches.includes(:role, :branch_questions)
+    @survey_branches_with_associations ||= branches_scope.includes(:role, :branch_questions)
+  end
+
+  def responses_scope
+    @show_deleted ? @survey.responses.with_deleted : @survey.responses
+  end
+
+  def branches_scope
+    @show_deleted ? @survey.survey_branches.with_deleted : @survey.survey_branches
+  end
+
+  def questions_scope
+    @show_deleted ? @survey.questions.with_deleted : @survey.questions
   end
 
   def responses_for_branch(branch)
-    @survey.responses.where(survey_branch: branch)
+    responses_scope.where(survey_branch: branch)
   end
 
   def responses_by_date_range(days)
@@ -180,7 +206,7 @@ class BranchAnalyticsController < ApplicationController
     start_date = end_date - (days - 1).days
     
     # Get responses within date range
-    responses_in_range = @survey.responses.where(created_at: start_date.beginning_of_day..end_date.end_of_day)
+    responses_in_range = responses_scope.where(created_at: start_date.beginning_of_day..end_date.end_of_day)
     
     # Group by date and count
     grouped_responses = responses_in_range.group("DATE(created_at)").count
@@ -193,5 +219,29 @@ class BranchAnalyticsController < ApplicationController
     end
     
     result
+  end
+
+  def deleted_responses_timeline
+    @survey.responses.only_deleted
+        .where('deleted_at >= ?', 30.days.ago)
+        .group("DATE(deleted_at)")
+        .order("DATE(deleted_at)")
+        .count
+  end
+
+  def deleted_questions_by_type
+    @survey.questions.only_deleted.group(:question_type).count.transform_keys(&:humanize)
+  end
+
+  def deleted_branches_by_role
+    @survey.survey_branches.only_deleted.joins(:role).group('roles.name').count
+  end
+
+  def recent_deletions
+    {
+      responses: @survey.responses.only_deleted.order(deleted_at: :desc).limit(5).pluck(:deleted_at, :value),
+      questions: @survey.questions.only_deleted.order(deleted_at: :desc).limit(5).pluck(:deleted_at, :content),
+      branches: @survey.survey_branches.only_deleted.includes(:role).order(deleted_at: :desc).limit(5).map { |b| [b.deleted_at, b.role.display_name] }
+    }
   end
 end

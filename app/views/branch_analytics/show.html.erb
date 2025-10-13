@@ -5,6 +5,20 @@
     <p class="mt-2 text-gray-600"><%= @survey.description %></p>
     
     <%= link_to "← Back to Survey", survey_path(@survey), class: "mt-4 inline-flex items-center text-indigo-600 hover:text-indigo-900" %>
+    
+    <!-- Analytics Filter Tabs -->
+    <div class="border-b border-gray-200 mt-6">
+      <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+        <%= link_to survey_analytics_path(@survey), 
+            class: "#{@show_deleted ? 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' : 'border-indigo-500 text-indigo-600'} whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" do %>
+          Active Data Only
+        <% end %>
+        <%= link_to survey_analytics_path(@survey, show_deleted: true), 
+            class: "#{@show_deleted ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" do %>
+          Include Deleted Data
+        <% end %>
+      </nav>
+    </div>
   </div>
 
   <!-- Overview Section -->
@@ -19,8 +33,15 @@
           </div>
           <div class="ml-5 w-0 flex-1">
             <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">Total Responses</dt>
-              <dd class="text-lg font-medium text-gray-900"><%= @analytics[:overview][:total_responses] %></dd>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                <%= @show_deleted ? "Total Responses (+ Deleted)" : "Total Responses" %>
+              </dt>
+              <dd class="text-lg font-medium text-gray-900">
+                <%= @analytics[:overview][:total_responses] %>
+                <% if @show_deleted && @analytics[:overview][:deleted_responses] > 0 %>
+                  <span class="text-sm text-red-500 ml-2">(+<%= @analytics[:overview][:deleted_responses] %> deleted)</span>
+                <% end %>
+              </dd>
             </dl>
           </div>
         </div>
@@ -37,8 +58,15 @@
           </div>
           <div class="ml-5 w-0 flex-1">
             <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">Active Branches</dt>
-              <dd class="text-lg font-medium text-gray-900"><%= @analytics[:overview][:total_branches] %></dd>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                <%= @show_deleted ? "Total Branches (+ Deleted)" : "Active Branches" %>
+              </dt>
+              <dd class="text-lg font-medium text-gray-900">
+                <%= @analytics[:overview][:total_branches] %>
+                <% if @show_deleted && @analytics[:overview][:deleted_branches] > 0 %>
+                  <span class="text-sm text-red-500 ml-2">(+<%= @analytics[:overview][:deleted_branches] %> deleted)</span>
+                <% end %>
+              </dd>
             </dl>
           </div>
         </div>
@@ -55,8 +83,15 @@
           </div>
           <div class="ml-5 w-0 flex-1">
             <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">Total Questions</dt>
-              <dd class="text-lg font-medium text-gray-900"><%= @analytics[:overview][:total_questions] %></dd>
+              <dt class="text-sm font-medium text-gray-500 truncate">
+                <%= @show_deleted ? "Total Questions (+ Deleted)" : "Total Questions" %>
+              </dt>
+              <dd class="text-lg font-medium text-gray-900">
+                <%= @analytics[:overview][:total_questions] %>
+                <% if @show_deleted && @analytics[:overview][:deleted_questions] > 0 %>
+                  <span class="text-sm text-red-500 ml-2">(+<%= @analytics[:overview][:deleted_questions] %> deleted)</span>
+                <% end %>
+              </dd>
             </dl>
           </div>
         </div>
@@ -129,6 +164,88 @@
       </table>
     </div>
   </div>
+
+  <% if @show_deleted %>
+    <!-- Deletion Analytics Section -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-md mb-8">
+      <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Deletion Analytics</h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">Insights into deleted data patterns</p>
+      </div>
+      
+      <div class="px-4 py-5 sm:p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Recent Deletions -->
+          <div>
+            <h4 class="text-md font-medium text-gray-900 mb-3">Recent Deletions</h4>
+            <div class="space-y-3">
+              <% if @analytics[:deletion_summary][:recent_deletions][:responses].any? %>
+                <div>
+                  <h5 class="text-sm font-medium text-gray-700">Responses</h5>
+                  <ul class="mt-2 text-sm text-gray-600">
+                    <% @analytics[:deletion_summary][:recent_deletions][:responses].each do |deleted_at, value| %>
+                      <li class="flex justify-between">
+                        <span class="truncate"><%= truncate(value, length: 30) %></span>
+                        <span class="text-xs text-gray-400"><%= deleted_at.strftime('%m/%d/%y') %></span>
+                      </li>
+                    <% end %>
+                  </ul>
+                </div>
+              <% end %>
+              
+              <% if @analytics[:deletion_summary][:recent_deletions][:questions].any? %>
+                <div>
+                  <h5 class="text-sm font-medium text-gray-700">Questions</h5>
+                  <ul class="mt-2 text-sm text-gray-600">
+                    <% @analytics[:deletion_summary][:recent_deletions][:questions].each do |deleted_at, content| %>
+                      <li class="flex justify-between">
+                        <span class="truncate"><%= truncate(content, length: 30) %></span>
+                        <span class="text-xs text-gray-400"><%= deleted_at.strftime('%m/%d/%y') %></span>
+                      </li>
+                    <% end %>
+                  </ul>
+                </div>
+              <% end %>
+            </div>
+          </div>
+          
+          <!-- Deletion Patterns -->
+          <div>
+            <h4 class="text-md font-medium text-gray-900 mb-3">Deletion Patterns</h4>
+            <div class="space-y-3">
+              <% if @analytics[:deletion_summary][:deleted_questions_by_type].any? %>
+                <div>
+                  <h5 class="text-sm font-medium text-gray-700">Deleted Questions by Type</h5>
+                  <ul class="mt-2 text-sm text-gray-600">
+                    <% @analytics[:deletion_summary][:deleted_questions_by_type].each do |type, count| %>
+                      <li class="flex justify-between">
+                        <span><%= type %></span>
+                        <span class="font-medium"><%= count %></span>
+                      </li>
+                    <% end %>
+                  </ul>
+                </div>
+              <% end %>
+              
+              <% if @analytics[:deletion_summary][:deleted_branches_by_role].any? %>
+                <div>
+                  <h5 class="text-sm font-medium text-gray-700">Deleted Branches by Role</h5>
+                  <ul class="mt-2 text-sm text-gray-600">
+                    <% @analytics[:deletion_summary][:deleted_branches_by_role].each do |role, count| %>
+                      <li class="flex justify-between">
+                        <span><%= role.humanize %></span>
+                        <span class="font-medium"><%= count %></span>
+                      </li>
+                    <% end %>
+                  </ul>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
 
   <!-- Question Analysis Section -->
   <div class="bg-white shadow overflow-hidden sm:rounded-md mb-8">

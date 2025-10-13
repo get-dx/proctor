@@ -1,9 +1,15 @@
 class SurveysController < ApplicationController
-  before_action :set_survey, only: [:show, :edit, :update, :destroy, :take, :submit]
+  before_action :set_survey, only: [:show, :edit, :update, :destroy, :take, :submit, :restore]
 
   def index
-    @surveys = Survey.all
+    @surveys = params[:show_deleted] == 'true' ? Survey.with_deleted : Survey.all
+    @show_deleted = params[:show_deleted] == 'true'
     @roles = Role.all.map { |role| { id: role.id, name: role.display_name } }
+  end
+
+  def deleted
+    @surveys = Survey.only_deleted
+    render :index
   end
 
   def show
@@ -54,7 +60,12 @@ class SurveysController < ApplicationController
 
   def destroy
     @survey.destroy
-    redirect_to surveys_url, notice: 'Survey was successfully destroyed.'
+    redirect_to surveys_url, notice: 'Survey was successfully soft deleted. It can be restored if needed.'
+  end
+
+  def restore
+    @survey.restore
+    redirect_to surveys_url, notice: 'Survey was successfully restored.'
   end
   
   def take
@@ -107,11 +118,15 @@ class SurveysController < ApplicationController
   end
 
   private
-  
+
   def set_survey
-    @survey = Survey.find(params[:id])
+    if action_name == 'restore'
+      @survey = Survey.with_deleted.find(params[:id])
+    else
+      @survey = Survey.find(params[:id])
+    end
   end
-  
+
   def survey_params
     params.require(:survey).permit(:title, :description)
   end

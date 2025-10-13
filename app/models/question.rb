@@ -1,8 +1,10 @@
 
 class Question < ApplicationRecord
-  has_many :branch_questions, dependent: :destroy
+  include SoftDeletable
+  
+  has_many :branch_questions
   has_many :survey_branches, through: :branch_questions
-  has_many :responses, dependent: :destroy
+  has_many :responses
 
   validates :content, presence: true
   validates :question_type, presence: true

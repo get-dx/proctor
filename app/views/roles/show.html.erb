@@ -2,12 +2,73 @@
   <div class="bg-white shadow overflow-hidden sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Role: <%= @role.display_name %></h1>
+        <h1 class="text-2xl font-bold text-gray-900">
+          Role: <%= @role.display_name %>
+          <% if @role.deleted? %>
+            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              Soft Deleted
+            </span>
+          <% end %>
+        </h1>
       </div>
       <div class="flex space-x-4">
-        <%= link_to 'Edit', edit_role_path(@role), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        <% unless @role.deleted? %>
+          <%= link_to 'Edit', edit_role_path(@role), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        <% else %>
+          <%= button_to 'Restore', restore_role_path(@role), method: :patch, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500", form: { data: { turbo_confirm: "Are you sure you want to restore this role?" } } %>
+        <% end %>
         <%= link_to 'Back', roles_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
       </div>
     </div>
+
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">Role Information</h3>
+      <div class="mt-5">
+        <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Name</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @role.display_name %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Survey Branches</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @role.survey_branches.count %></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <% if @role.deleted? %>
+      <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+          <div class="flex">
+            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Soft Deleted</h3>
+              <div class="mt-2 text-sm text-red-700">
+                <p>This role was soft deleted on <%= @role.deleted_at.strftime('%B %d, %Y at %I:%M %p') %>. The data is preserved and can be restored.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+        <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+          <div class="flex">
+            <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-blue-800">Soft Delete Available</h3>
+              <div class="mt-2 text-sm text-blue-700">
+                <p>This role can be soft deleted, preserving all associated survey data. Soft deleted roles can be restored later if needed.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>

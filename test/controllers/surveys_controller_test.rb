@@ -57,10 +57,32 @@ class SurveysControllerTest < ActionDispatch::IntegrationTest
     assert_not_equal '', @survey.title
   end
 
-  test "should destroy survey" do
-    assert_difference('Survey.count', -1) do
-      delete survey_url(@survey)
+  test "should soft delete survey" do
+    # Should not change total count (including deleted)
+    assert_no_difference('Survey.with_deleted.count') do
+      # But should decrease active count
+      assert_difference('Survey.count', -1) do
+        delete survey_url(@survey)
+      end
     end
+    
+    @survey.reload
+    assert @survey.deleted?
+    assert_redirected_to surveys_url
+  end
+  
+  test "should restore survey" do
+    # First soft delete the survey
+    @survey.destroy
+    assert @survey.deleted?
+    
+    # Then restore it
+    assert_difference('Survey.count', 1) do
+      patch restore_survey_url(@survey)
+    end
+    
+    @survey.reload
+    assert_not @survey.deleted?
     assert_redirected_to surveys_url
   end
 

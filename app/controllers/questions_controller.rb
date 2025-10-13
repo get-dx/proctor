@@ -1,11 +1,12 @@
 class QuestionsController < ApplicationController
   before_action :set_survey
-  before_action :set_question, only: [:edit, :update, :destroy]
+  before_action :set_question, only: [:edit, :update, :destroy, :restore]
   before_action :set_role, only: [:new, :create, :edit, :update, :destroy]
   before_action :set_roles, only: [:new, :create, :edit, :update]
 
   def index
-    @questions = @survey.questions.distinct
+    @questions = params[:show_deleted] == 'true' ? @survey.questions.with_deleted : @survey.questions
+    @questions = @questions.distinct
 
     if params[:survey_branch_id].present?
       @questions = @questions.joins(:branch_questions)
@@ -22,8 +23,12 @@ class QuestionsController < ApplicationController
     respond_to do |format|
       format.json do
         render json: @questions.as_json(
-          only: [:id, :content, :question_type, :required]
-        )
+          only: [:id, :content, :question_type, :required],
+          methods: [:deleted?]
+        ).map do |q|
+          q['deleted_at'] = @questions.find(q['id']).deleted_at&.strftime('%B %d, %Y') if q['deleted?']
+          q
+        end
       end
       format.html { redirect_to survey_path(@survey) }
     end
@@ -66,7 +71,15 @@ class QuestionsController < ApplicationController
     @question.destroy
     respond_to do |format|
       format.json { head :no_content }
-      format.html { redirect_to survey_path(@survey), notice: 'Question was successfully destroyed.' }
+      format.html { redirect_to survey_path(@survey), notice: 'Question was successfully soft deleted. It can be restored if needed.' }
+    end
+  end
+  
+  def restore
+    @question.restore
+    respond_to do |format|
+      format.json { head :no_content }
+      format.html { redirect_to survey_path(@survey), notice: 'Question was successfully restored.' }
     end
   end
   
@@ -77,7 +90,11 @@ class QuestionsController < ApplicationController
   end
   
   def set_question
-    @question = @survey.questions.find(params[:id])
+    if action_name == 'restore'
+      @question = @survey.questions.with_deleted.find(params[:id])
+    else
+      @question = @survey.questions.find(params[:id])
+    end
   end
 
   def set_role

@@ -1,10 +1,12 @@
 
 class SurveyBranch < ApplicationRecord
+  include SoftDeletable
+  
   belongs_to :survey
   belongs_to :role
-  has_many :branch_questions, dependent: :destroy
+  has_many :branch_questions
   has_many :questions, through: :branch_questions
-  has_many :responses, dependent: :destroy
+  has_many :responses
 
   validates :role_id, uniqueness: { scope: :survey_id }
 

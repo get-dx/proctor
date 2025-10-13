@@ -1,7 +1,7 @@
 require "application_system_test_case"
 
 class SurveysTest < ApplicationSystemTestCase
-  test "user can create, edit, and delete a survey" do
+  test "user can create, edit, and soft delete a survey" do
     visit surveys_path
     click_on "New Survey"
     fill_in "Title", with: "System Test Survey"
@@ -15,12 +15,31 @@ class SurveysTest < ApplicationSystemTestCase
     click_on "Update Survey"
     assert_text "Updated System Test Survey"
     click_on "Back to Surveys"
+    
+    # Test soft delete
     within("li", text: "Updated System Test Survey") do
       accept_confirm do
         click_on "Delete"
       end
     end
     assert_no_text "Updated System Test Survey"
+    
+    # Test that deleted survey appears in "All Surveys" tab
+    click_on "All Surveys"
+    assert_text "Updated System Test Survey"
+    assert_text "Deleted"
+    
+    # Test restore functionality
+    within("li", text: "Updated System Test Survey") do
+      accept_confirm do
+        click_on "Restore"
+      end
+    end
+    
+    # Switch back to active surveys and verify it's restored
+    click_on "Active Surveys"
+    assert_text "Updated System Test Survey"
+    assert_no_text "Deleted"
   end
 
   test "user can take a survey" do
