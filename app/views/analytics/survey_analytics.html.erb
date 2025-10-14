@@ -1,0 +1,73 @@
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+  <div class="px-4 py-5 sm:px-6">
+    <h1 class="text-3xl font-bold text-gray-900"><%= @survey.title %> - Analytics</h1>
+    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+      Response analytics broken down by role and question
+    </p>
+    <div class="mt-4">
+      <%= link_to "← Back to Survey", survey_path(@survey), 
+          class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+    </div>
+  </div>
+
+  <% if @responses.any? %>
+    <!-- Summary Statistics -->
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-blue-50 p-4 rounded-lg">
+          <div class="text-2xl font-bold text-blue-600"><%= @responses.count %></div>
+          <div class="text-sm text-blue-800">Total Responses</div>
+        </div>
+        <div class="bg-green-50 p-4 rounded-lg">
+          <div class="text-2xl font-bold text-green-600"><%= @questions.count %></div>
+          <div class="text-sm text-green-800">Total Questions</div>
+        </div>
+        <div class="bg-purple-50 p-4 rounded-lg">
+          <div class="text-2xl font-bold text-purple-600"><%= @roles.count %></div>
+          <div class="text-sm text-purple-800">Active Roles</div>
+        </div>
+        <div class="bg-yellow-50 p-4 rounded-lg">
+          <div class="text-2xl font-bold text-yellow-600">
+            <%= @responses.select(&:role_id).map(&:role_id).uniq.count %>
+          </div>
+          <div class="text-sm text-yellow-800">Roles with Responses</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Responses by Role -->
+    <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Responses by Role</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <% @roles.each do |role| %>
+          <% role_responses = @responses.select { |r| r.role_id == role.id } %>
+          <div class="border border-gray-200 rounded-lg p-4">
+            <h3 class="font-medium text-gray-900"><%= role.role %></h3>
+            <div class="mt-2">
+              <div class="text-2xl font-bold text-indigo-600"><%= role_responses.count %></div>
+              <div class="text-sm text-gray-500">responses</div>
+            </div>
+            <% if role_responses.any? %>
+              <div class="mt-2 text-xs text-gray-400">
+                Questions answered: <%= role_responses.map(&:question_id).uniq.count %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>    
+
+  <% else %>
+    <!-- No responses state -->
+    <div class="text-center py-12">
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No responses yet</h3>
+      <p class="mt-1 text-sm text-gray-500">
+        Analytics will appear here once people start completing the survey.
+      </p>
+      <div class="mt-6">
+        <%= link_to "Share Survey", survey_path(@survey), 
+                    class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      </div>
+    </div>
+  <% end %>
+</div>

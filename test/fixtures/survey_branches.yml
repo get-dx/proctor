@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  survey: one
+  name: MyString
+  role: MyString
+  description: MyText
+
+two:
+  survey: two
+  name: MyString
+  role: MyString
+  description: MyText
